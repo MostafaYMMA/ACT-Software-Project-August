@@ -49,10 +49,10 @@ const Store = {
     if(this.getTasks(email).length) return;
     const now = Date.now();
     this.saveTasks(email, [
-      { id: crypto.randomUUID(), title: 'Wireframe the onboarding flow', priority: 'high', done: false, createdAt: now - 86400000 * 2 },
-      { id: crypto.randomUUID(), title: 'Review pull request #114',      priority: 'med',  done: false, createdAt: now - 86400000 },
-      { id: crypto.randomUUID(), title: 'Write weekly status update',    priority: 'low',  done: true,  createdAt: now - 86400000 * 3 },
-      { id: crypto.randomUUID(), title: 'Sync with design on sidebar UI', priority: 'med', done: true,  createdAt: now - 86400000 * 4 },
+      { id: crypto.randomUUID(), title: 'Wireframe the onboarding flow', priority: 'high', done: false, status: 'active', project: 'OSMO Website', createdAt: now - 86400000 * 2 },
+      { id: crypto.randomUUID(), title: 'Review pull request #114',      priority: 'med',  done: false, status: 'active', project: 'ACT Dashboard', createdAt: now - 86400000 },
+      { id: crypto.randomUUID(), title: 'Write weekly status update',    priority: 'low',  done: true,  status: 'completed', project: 'Internal', createdAt: now - 86400000 * 3 },
+      { id: crypto.randomUUID(), title: 'Sync with design on sidebar UI', priority: 'med', done: true,  status: 'completed', project: 'OSMO Website', createdAt: now - 86400000 * 4 },
     ]);
   }
 };
