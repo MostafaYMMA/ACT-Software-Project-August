@@ -52,3 +52,26 @@ def claim_task(task_id: int, pm_id: int) -> dict:
     if claimed is None:
         raise ValueError("Task is not claimable (already assigned or does not exist)")
     return claimed
+
+
+def delete_task(task_id: int) -> None:
+    """Permanently delete a task. Caller (router) must enforce admin-only access."""
+    task = task_repository.get_task_by_id(task_id)
+    if task is None:
+        raise ValueError("Task not found")
+    task_repository.delete_task(task_id)
+
+
+def unassign_task(task_id: int, current_pm) -> dict:
+    """Unassign a task. Allowed for the PM it's currently assigned to, or an admin."""
+    task = task_repository.get_task_by_id(task_id)
+    if task is None:
+        raise ValueError("Task not found")
+
+    if not current_pm.is_admin and task.get("assigned_pm_id") != current_pm.id:
+        raise PermissionError("You can only unassign tasks assigned to you")
+
+    updated = task_repository.unassign_task(task_id)
+    if updated is None:
+        raise ValueError("Task could not be unassigned")
+    return updated
