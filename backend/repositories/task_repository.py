@@ -1,55 +1,59 @@
-"""
-Example of the pattern to copy for pm_repository.py and sync_state_repository.py.
-Repositories are pure data access — no business decisions (that's services/).
-"""
-
-from repositories.supabase_client import get_supabase
+from repositories.supabase_client import get_supabase_client
 
 TABLE = "tasks"
 
 
 def list_tasks() -> list[dict]:
-    supabase = get_supabase()
-    response = supabase.table(TABLE).select("*").execute()
-    return response.data
+    resp = get_supabase_client().table(TABLE).select("*").execute()
+    return resp.data
 
 
 def get_task_by_id(task_id: str) -> dict | None:
-    supabase = get_supabase()
-    response = supabase.table(TABLE).select("*").eq("id", task_id).maybe_single().execute()
-    return response.data if response else None
+    resp = get_supabase_client().table(TABLE).select("*").eq("id", task_id).maybe_single().execute()
+    return resp.data if resp else None
+
+
+def find_by_source_reference(source_reference: str) -> dict | None:
+    """Look up an existing task by the (not-yet-finalized) dedupe key.
+
+    See CLAUDE.md "Open decisions" - source_reference is a placeholder until
+    the team confirms which field(s) uniquely identify a task record.
+    """
+    resp = (
+        get_supabase_client()
+        .table(TABLE)
+        .select("*")
+        .eq("source_reference", source_reference)
+        .maybe_single()
+        .execute()
+    )
+    return resp.data if resp else None
 
 
 def create_task(task: dict) -> dict:
-    supabase = get_supabase()
-    response = supabase.table(TABLE).insert(task).execute()
-    return response.data[0]
+    resp = get_supabase_client().table(TABLE).insert(task).execute()
+    return resp.data[0]
 
 
-def overwrite_task(match_column: str, match_value: str, task: dict) -> dict:
-    """
-    Full overwrite of an existing task record (per CLAUDE.md rule 3 — not a merge).
-    `match_column` is whatever field the team decides is the dedupe key
-    (still an open decision as of writing).
-    """
-    supabase = get_supabase()
-    response = (
-        supabase.table(TABLE).update(task).eq(match_column, match_value).execute()
-    )
-    return response.data[0]
+def overwrite_task(task_id: str, task: dict) -> dict:
+    """Fully replace an existing task record (not a merge), per CLAUDE.md rule 3."""
+    resp = get_supabase_client().table(TABLE).update(task).eq("id", task_id).execute()
+    return resp.data[0]
 
 
-def claim_task_if_unassigned(task_id: str, pm_id: str) -> dict | None:
+def claim_task(task_id: str, pm_id: str) -> dict | None:
+    """Atomically self-assign an unassigned task.
+
+    Uses a conditional UPDATE ... WHERE status = 'unassigned' so two PMs
+    racing to claim the same task cannot both succeed (CLAUDE.md convention -
+    no application-level locking).
     """
-    Atomic conditional update for the self-assign race condition:
-    only succeeds if status is still 'unassigned' at update time.
-    """
-    supabase = get_supabase()
-    response = (
-        supabase.table(TABLE)
+    resp = (
+        get_supabase_client()
+        .table(TABLE)
         .update({"status": "assigned", "assigned_pm_id": pm_id})
         .eq("id", task_id)
         .eq("status", "unassigned")
         .execute()
     )
-    return response.data[0] if response.data else None
+    return resp.data[0] if resp.data else None
