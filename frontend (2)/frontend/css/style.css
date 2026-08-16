@@ -81,40 +81,29 @@ body.dark-mode {
   --shadow-pop:
     0 4px 14px rgba(249,115,22,0.25);
 }
+
 /* =========================================================
-   ACT DARK MODE
+   DARK MODE ANIMATION
    ========================================================= */
 
-body.dark-mode {
-  --color-bg: #111111;
-  --color-surface: #1B1B1B;
-  --color-ink: #F5F5F5;
-  --color-ink-soft: #A8A8A8;
-
-  --color-primary: #F97316;
-  --color-primary-dark: #FB923C;
-  --color-primary-darker: #FDBA74;
-  --color-primary-tint: #2A1A10;
-  --color-primary-tint-strong: #3A2415;
-
-  --color-line: #333333;
-  --color-line-strong: #444444;
-
-  --color-danger: #EF4444;
-  --color-danger-tint: #351818;
-
-  --color-warn: #F59E0B;
-  --color-warn-tint: #352A12;
-
-  --color-good: #22C55E;
-  --color-good-tint: #132A1B;
-
-  --shadow-card:
-    0 1px 2px rgba(0,0,0,0.25),
-    0 10px 28px rgba(0,0,0,0.25);
-
-  --shadow-pop:
-    0 4px 14px rgba(249,115,22,0.25);
+body,
+.header-bar,
+.sidebar,
+.card,
+.stat-tile,
+.project-card,
+.team-card,
+.task-item,
+.modal,
+input,
+select,
+textarea,
+button {
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
 }
  /* Dark mode page background */
 
