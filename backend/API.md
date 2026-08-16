@@ -54,19 +54,38 @@ Self-assign an `unassigned` task to the calling PM.
 
 ### `Task` shape (`models/task.py`)
 
+Fields mirror the columns in the supplier-schedule table each email delivers, plus internal bookkeeping fields.
+
 ```json
 {
   "id": 1,
-  "title": "string",
-  "description": "string | null",
+  "supplier_name": "string",
+  "resource": "string",
+  "resource_start": "2026-08-16",
+  "resource_end": "2026-08-30",
+  "hours_allocated": 40.0,
+  "project_number": "string",
+  "task_number": "string",
+  "pm": "string | null",
+  "resource_manager": "string | null",
+  "project_status": "string | null",
+  "project_country": "string | null",
+  "remote_onsite": "string | null",
+  "brand": "string | null",
+  "po": "string | null",
+  "sow": "string | null",
+  "rate_type": "string | null",
   "status": "assigned | unassigned",
   "assigned_pm_id": "int | null",
   "source_email_id": "string",
-  "source_reference": "string | null",
   "created_at": "2026-08-16T00:00:00Z",
   "updated_at": "2026-08-16T00:00:00Z"
 }
 ```
+
+Note the two different "status" concepts: `project_status` is free text carried over verbatim from the email (e.g. "Active", "On Hold"); `status` (`assigned`/`unassigned`) is this app's own claim-workflow state, unrelated to `project_status`.
+
+Dedupe key for the "email references existing task → overwrite" rule (CLAUDE.md rule 3) is confirmed as **`project_number` + `task_number`** together (`repositories/task_repository.find_by_project_and_task_number`).
 
 ---
 
@@ -115,9 +134,10 @@ Triggers a scan of the shared mailbox: fetches new messages via Microsoft Graph,
 These aren't implemented yet but are implied by the models or by the CLAUDE.md conventions — flagging so documentation and implementation stay in sync as they land:
 
 - **`POST /tasks`** — `TaskCreate` model exists but there's no router path that accepts it directly (task creation currently only happens indirectly via `/sync/emails`). Confirm whether manual task creation should be exposed at all.
-- **`PATCH /tasks/{task_id}`** — `TaskUpdate` model exists but is unused by any router. Needed if PMs should be able to edit title/description/status outside of claiming.
+- **`PATCH /tasks/{task_id}`** — `TaskUpdate` model exists but is unused by any router. Needed if PMs should be able to edit status/assignment outside of claiming.
 - **`POST /sync/emails` admin restriction** — CLAUDE.md lists this as an open decision; once resolved, apply `require_admin` here if it should be admin-only.
 - **`GET /pms/{pm_id}` 404 handling** — align with `tasks.get_task`'s explicit `HTTPException(404)` pattern once confirmed.
-- **Pagination / filtering on `GET /tasks`** — currently returns all tasks unfiltered; likely needed once task volume grows (e.g. `?status=unassigned`, `?assigned_pm_id=`).
+- **Pagination / filtering on `GET /tasks`** — currently returns all tasks unfiltered; likely needed once task volume grows (e.g. `?status=unassigned`, `?project_number=`, `?resource=`).
 - **Health check endpoint** (e.g. `GET /health`) — useful for Cloud Run / uptime checks given the stateless, scale-to-zero deployment model mentioned in CLAUDE.md.
-- **Dedupe key for overwrite matching** — once the team picks the field that uniquely identifies a task for the "email references existing task → overwrite" rule, document it here and in `ParsedTaskRow`/`TaskCreate`.
+- **HTML/plain-text email table parsing** — `services/parser.py` still raises `NotImplementedError` for both content types; needs real sample emails to confirm table structure before it can populate `ParsedTaskRow`.
+- **Matching `row.pm` to a PM record** — `task_service.upsert_task_from_row` currently assumes `row.pm` is an email address and looks it up via `pm_repository.get_by_email`. Confirm the email table actually puts an email (not a display name) in the `pm` column.
