@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 class PM(BaseModel):
-    id: int   
+    id: int
     email: str
     auth_id: str          # links this PM row to their Supabase Auth login
     is_admin: bool = False          # ← new field
