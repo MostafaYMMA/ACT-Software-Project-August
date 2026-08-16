@@ -13,7 +13,7 @@ def upsert_task_from_row(row: ParsedTaskRow, source_email_id: str) -> dict:
     assigned_pm_id = None
     status = TaskStatus.UNASSIGNED
     if row.assigned_pm_email:
-        pm = pm_repository.get_pm_by_email(row.assigned_pm_email)
+        pm = pm_repository.get_by_email(row.assigned_pm_email)
         if pm:
             assigned_pm_id = pm["id"]
             status = TaskStatus.ASSIGNED
@@ -41,11 +41,11 @@ def list_tasks() -> list[dict]:
     return task_repository.list_tasks()
 
 
-def get_task(task_id: str) -> dict | None:
+def get_task(task_id: int) -> dict | None:
     return task_repository.get_task_by_id(task_id)
 
 
-def claim_task(task_id: str, pm_id: str) -> dict:
+def claim_task(task_id: int, pm_id: int) -> dict:
     """Self-assign an unassigned task. Relies on an atomic conditional UPDATE
     in the repository layer to resolve the two-PMs-claiming-at-once race."""
     claimed = task_repository.claim_task(task_id, pm_id)

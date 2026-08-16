@@ -1,15 +1,18 @@
-from repositories.supabase_client import get_supabase_client
+"""
+Repositories are pure data access — no business decisions (that's services/).
+"""
+from repositories.supabase_client import get_supabase
 
 TABLE = "tasks"
 
 
 def list_tasks() -> list[dict]:
-    resp = get_supabase_client().table(TABLE).select("*").execute()
+    resp = get_supabase().table(TABLE).select("*").execute()
     return resp.data
 
 
-def get_task_by_id(task_id: str) -> dict | None:
-    resp = get_supabase_client().table(TABLE).select("*").eq("id", task_id).maybe_single().execute()
+def get_task_by_id(task_id: int) -> dict | None:
+    resp = get_supabase().table(TABLE).select("*").eq("id", task_id).maybe_single().execute()
     return resp.data if resp else None
 
 
@@ -20,7 +23,7 @@ def find_by_source_reference(source_reference: str) -> dict | None:
     the team confirms which field(s) uniquely identify a task record.
     """
     resp = (
-        get_supabase_client()
+        get_supabase()
         .table(TABLE)
         .select("*")
         .eq("source_reference", source_reference)
@@ -31,17 +34,17 @@ def find_by_source_reference(source_reference: str) -> dict | None:
 
 
 def create_task(task: dict) -> dict:
-    resp = get_supabase_client().table(TABLE).insert(task).execute()
+    resp = get_supabase().table(TABLE).insert(task).execute()
     return resp.data[0]
 
 
-def overwrite_task(task_id: str, task: dict) -> dict:
+def overwrite_task(task_id: int, task: dict) -> dict:
     """Fully replace an existing task record (not a merge), per CLAUDE.md rule 3."""
-    resp = get_supabase_client().table(TABLE).update(task).eq("id", task_id).execute()
+    resp = get_supabase().table(TABLE).update(task).eq("id", task_id).execute()
     return resp.data[0]
 
 
-def claim_task(task_id: str, pm_id: str) -> dict | None:
+def claim_task(task_id: int, pm_id: int) -> dict | None:
     """Atomically self-assign an unassigned task.
 
     Uses a conditional UPDATE ... WHERE status = 'unassigned' so two PMs
@@ -49,7 +52,7 @@ def claim_task(task_id: str, pm_id: str) -> dict | None:
     no application-level locking).
     """
     resp = (
-        get_supabase_client()
+        get_supabase()
         .table(TABLE)
         .update({"status": "assigned", "assigned_pm_id": pm_id})
         .eq("id", task_id)

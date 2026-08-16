@@ -24,7 +24,7 @@ class TaskCreate(BaseModel):
     title: str
     description: str | None = None
     status: TaskStatus
-    assigned_pm_id: str | None = None
+    assigned_pm_id: int | None = None
     source_email_id: str
     source_reference: str | None = None
 
@@ -33,15 +33,15 @@ class TaskUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
     status: TaskStatus | None = None
-    assigned_pm_id: str | None = None
+    assigned_pm_id: int | None = None
 
 
 class Task(BaseModel):
-    id: str
+    id: int
     title: str
     description: str | None = None
     status: TaskStatus
-    assigned_pm_id: str | None = None
+    assigned_pm_id: int | None = None
     source_email_id: str
     source_reference: str | None = None
     created_at: datetime
