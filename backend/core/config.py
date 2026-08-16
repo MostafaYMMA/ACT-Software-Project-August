@@ -31,3 +31,6 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     """Cached so the .env file is only parsed once per process."""
     return Settings()
+
+
+settings = get_settings()
