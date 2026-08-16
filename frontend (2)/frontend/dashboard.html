@@ -71,8 +71,8 @@
 
     <main class="main">
       <div class="content-top">
-        <div class="eyebrow">Overview</div>
-        <h1>Dashboard</h1>
+        <h1>Welcome, <span id="userName">User</span> 👋</h1>
+        <div class="eyebrow">Here's what's happening with your projects today.</div>
       </div>
 
       <div class="content">
@@ -106,16 +106,21 @@
   const user = requireAuth();
   if(user){
     initShell('dashboard', user);
-
+    document.getElementById('userName').textContent = user.name || user.email || 'User';
     function paint(){
       const s = taskStats(user.email);
 
       document.getElementById('stat-grid').innerHTML = `
         <div class="stat-tile">
-          <div class="label">Open tasks</div>
+          <div class="label">Total tasks</div>
           <div class="value">${s.open}</div>
           <div class="delta">${s.total} total tracked</div>
-        </div>
+          </div>
+          <div class="stat-tile">
+            <div class="label">In Progress</div>
+            <div class="value">${s.open}</div>
+            <div class="delta">${s.open} tasks in progress</div>
+          </div>
         <div class="stat-tile">
           <div class="label">Completed</div>
           <div class="value">${s.done}</div>
@@ -156,5 +161,10 @@
     paint();
   }
 </script>
+<!-- <script>
+  const userName = localStorage.getItem("username");
+
+  document.getElementById("userName").textContent = userName || "User";
+</script> -->
 </body>
 </html>
