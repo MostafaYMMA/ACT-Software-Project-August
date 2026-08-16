@@ -1,6 +1,7 @@
 from models.task import ParsedTaskRow, TaskStatus
 from repositories import pm_repository, task_repository
-
+from models.task import Task
+from repositories import task_repository
 
 def upsert_task_from_row(row: ParsedTaskRow, source_email_id: str) -> dict:
     """Apply the create-vs-overwrite / assigned-vs-unassigned rules from CLAUDE.md.
@@ -52,3 +53,8 @@ def claim_task(task_id: int, pm_id: int) -> dict:
     if claimed is None:
         raise ValueError("Task is not claimable (already assigned or does not exist)")
     return claimed
+
+
+
+def get_tasks_for_pm(pm_id: int) -> list[Task]:
+    return [Task(**row) for row in task_repository.query_by_pm(pm_id)]

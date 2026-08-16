@@ -3,6 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from api.v1.dependencies import get_current_pm
 from models.pm import PM
 from services import task_service
+from models.task import Task
+
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -26,3 +28,10 @@ def claim_task(task_id: int, current_pm: PM = Depends(get_current_pm)):
         return task_service.claim_task(task_id, current_pm.id)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+
+
+@router.get("/", response_model=list[Task])
+def list_pm_tasks(pm: int | None = None):
+    if pm is not None:
+        return task_service.get_tasks_for_pm(pm)
+    return task_service.list_tasks()  # existing function, if built
