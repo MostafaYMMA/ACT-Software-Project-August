@@ -44,6 +44,24 @@ def overwrite_task(task_id: int, task: dict) -> dict:
     return resp.data[0]
 
 
+def delete_task(task_id: int) -> bool:
+    """Permanently remove a task record."""
+    resp = get_supabase().table(TABLE).delete().eq("id", task_id).execute()
+    return bool(resp.data)
+
+
+def unassign_task(task_id: int) -> dict | None:
+    """Clear a task's assignment and set it back to unassigned."""
+    resp = (
+        get_supabase()
+        .table(TABLE)
+        .update({"status": "unassigned", "assigned_pm_id": None})
+        .eq("id", task_id)
+        .execute()
+    )
+    return resp.data[0] if resp.data else None
+
+
 def claim_task(task_id: int, pm_id: int) -> dict | None:
     """Atomically self-assign an unassigned task.
 
