@@ -16,17 +16,18 @@ def get_task_by_id(task_id: int) -> dict | None:
     return resp.data if resp else None
 
 
-def find_by_source_reference(source_reference: str) -> dict | None:
-    """Look up an existing task by the (not-yet-finalized) dedupe key.
+def find_by_project_and_task_number(project_number: str, task_number: str) -> dict | None:
+    """Look up an existing task by its dedupe key: project_number + task_number.
 
-    See CLAUDE.md "Open decisions" - source_reference is a placeholder until
-    the team confirms which field(s) uniquely identify a task record.
+    An email referencing an existing task fully overwrites it (CLAUDE.md
+    rule 3) rather than merging - this is how that existing record is found.
     """
     resp = (
         get_supabase()
         .table(TABLE)
         .select("*")
-        .eq("source_reference", source_reference)
+        .eq("project_number", project_number)
+        .eq("task_number", task_number)
         .maybe_single()
         .execute()
     )

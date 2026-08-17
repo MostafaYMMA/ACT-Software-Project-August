@@ -5,32 +5,28 @@ from repositories import pm_repository, task_repository
 def upsert_task_from_row(row: ParsedTaskRow, source_email_id: str) -> dict:
     """Apply the create-vs-overwrite / assigned-vs-unassigned rules from CLAUDE.md.
 
-    - No PM specified -> status: unassigned, any PM can self-claim later.
+    - No PM specified (row.pm empty) -> status: unassigned, any PM can self-claim later.
     - PM specified -> status: assigned to that PM.
-    - Row references an existing task (matched via source_reference) ->
-      fully overwrite the existing record, not a merge.
+    - Row references an existing task (matched via project_number + task_number,
+      the confirmed dedupe key) -> fully overwrite the existing record, not a merge.
     """
     assigned_pm_id = None
     status = TaskStatus.UNASSIGNED
-    if row.assigned_pm_email:
-        pm = pm_repository.get_by_email(row.assigned_pm_email)
+    if row.pm:
+        pm = pm_repository.get_by_email(row.pm)
         if pm:
             assigned_pm_id = pm["id"]
             status = TaskStatus.ASSIGNED
 
     task_payload = {
-        "title": row.title,
-        "description": row.description,
+        **row.model_dump(mode="json"),
         "status": status.value,
         "assigned_pm_id": assigned_pm_id,
         "source_email_id": source_email_id,
-        "source_reference": row.source_reference,
     }
 
-    existing = (
-        task_repository.find_by_source_reference(row.source_reference)
-        if row.source_reference
-        else None
+    existing = task_repository.find_by_project_and_task_number(
+        row.project_number, row.task_number
     )
     if existing:
         return task_repository.overwrite_task(existing["id"], task_payload)
