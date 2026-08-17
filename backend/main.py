@@ -1,7 +1,7 @@
 from fastapi import Depends, FastAPI
 
 from api.v1.dependencies import get_current_pm
-from api.v1.routers import pms, sync, tasks
+from api.v1.routers import pms, sync, tasks,schedule
 from models.pm import PM
 
 app = FastAPI(title="ACT Software Project - Backend")
@@ -9,7 +9,7 @@ app = FastAPI(title="ACT Software Project - Backend")
 app.include_router(tasks.router, prefix="/api/v1")
 app.include_router(pms.router, prefix="/api/v1")
 app.include_router(sync.router, prefix="/api/v1")
-
+app.include_router(schedule.router, prefix="/api/v1")
 
 @app.get("/")
 def root():
