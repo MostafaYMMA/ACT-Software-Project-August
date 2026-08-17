@@ -1,4 +1,4 @@
-from models.task import ParsedTaskRow, TaskStatus
+from models.task import ParsedTaskRow, TaskStatus,Task
 from repositories import pm_repository, task_repository
 
 
@@ -75,3 +75,7 @@ def unassign_task(task_id: int, current_pm) -> dict:
     if updated is None:
         raise ValueError("Task could not be unassigned")
     return updated
+
+def get_tasks_for_pm(pm_id: int) -> list[Task]:
+    """Get all tasks belonging to a specific PM."""
+    return [Task(**row) for row in task_repository.query_by_pm(pm_id)]

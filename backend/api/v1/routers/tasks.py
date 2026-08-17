@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from api.v1.dependencies import get_current_pm, require_admin
 from models.pm import PM
-from services import task_service
+from services import task_service,pm_service
+from models.task import Task
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -44,3 +45,9 @@ def unassign_task(task_id: int, current_pm: PM = Depends(get_current_pm)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except PermissionError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+
+@router.get("/{pm_id}/tasks", response_model=list[Task])
+def get_pm_tasks(pm_id: int):
+    """GET /pms/{pm_id}/tasks — return all tasks assigned to this PM."""
+    pm_service.get_pm(pm_id)  # confirms PM exists, raises 404 if not
+    return task_service.get_tasks_for_pm(pm_id)
