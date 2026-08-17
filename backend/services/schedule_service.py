@@ -1,24 +1,32 @@
 # backend/services/schedule_service.py
 from repositories import schedule_repository
 
-
-def get_total_hours(resource: str, brand: str) -> float:
-    """Total hours a resource has worked for a given brand."""
-    rows = schedule_repository.get_hours_rows(resource=resource, brand=brand)
-    return sum(row.get("hours_allocated") or 0 for row in rows)
+ALLOWED_ATTRIBUTES = {"brand", "rate_type", "project_country", "remote_or_onsite"}
 
 
-def get_total_hours_by_rate_type(resource: str, rate_type: str) -> float:
-    """Total hours a resource has worked under a given rate type."""
-    rows = schedule_repository.get_hours_rows(resource=resource, rate_type=rate_type)
-    return sum(row.get("hours_allocated") or 0 for row in rows)
+
+# backend/services/schedule_service.py
+
+ALLOWED_ATTRIBUTES = {
+    "brand",
+    "rate_type",
+    "project_country",
+    "remote_or_onsite",
+    "project_number",
+    "project_name",
+    "pm",
+    "resource_manager",
+}
 
 
-def get_total_hours_by_location_type(resource: str, remote_or_onsite: str) -> float:
-    rows = schedule_repository.get_hours_rows(resource=resource, remote_or_onsite=remote_or_onsite)
-    return sum(row.get("hours_allocated") or 0 for row in rows)
+def get_total_hours_dynamic(resource: str, **attribute_filters: str) -> float:
+    """
+    Total hours for a resource, filtered by any number of attributes.
+    attribute_filters example: {"brand": "IHG", "rate_type": "Hourly"}
+    """
+    invalid = set(attribute_filters) - ALLOWED_ATTRIBUTES
+    if invalid:
+        raise ValueError(f"Invalid attribute(s): {invalid}. Must be one of {ALLOWED_ATTRIBUTES}")
 
-
-def get_total_hours_by_country(resource: str, project_country: str) -> float:
-    rows = schedule_repository.get_hours_rows(resource=resource, project_country=project_country)
+    rows = schedule_repository.get_hours_rows(resource=resource, **attribute_filters)
     return sum(row.get("hours_allocated") or 0 for row in rows)

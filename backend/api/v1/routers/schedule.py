@@ -5,23 +5,34 @@ from services import schedule_service
 router = APIRouter(prefix="/schedule", tags=["schedule"])
 
 
-@router.get("/hours")
-def get_resource_hours(resource: str, brand: str) -> float:
-    """GET /schedule/hours?resource=...&brand=... — total hours worked."""
-    return schedule_service.get_total_hours(resource, brand)
+# backend/api/v1/routers/schedule.py
 
-@router.get("/hours/by-rate-type")
-def get_resource_hours_by_rate_type(resource: str, rate_type: str) -> float:
-    """GET /schedule/hours/by-rate-type?resource=...&rate_type=Hourly"""
-    return schedule_service.get_total_hours_by_rate_type(resource, rate_type)
+@router.get("/hours/dynamic")
+def get_hours_dynamic(
+    resource: str,
+    brand: str | None = None,
+    rate_type: str | None = None,
+    project_country: str | None = None,
+    remote_or_onsite: str | None = None,
+    project_number: str | None = None,
+    project_name: str | None = None,
+    pm: str | None = None,
+    resource_manager: str | None = None,
+) -> float:
+    """
+    GET /schedule/hours/dynamic?resource=...&brand=...&rate_type=...
+    All attribute filters optional — combine any number.
+    """
+    attribute_filters = {
+        "brand": brand,
+        "rate_type": rate_type,
+        "project_country": project_country,
+        "remote_or_onsite": remote_or_onsite,
+        "project_number": project_number,
+        "project_name": project_name,
+        "pm": pm,
+        "resource_manager": resource_manager,
+    }
+    attribute_filters = {k: v for k, v in attribute_filters.items() if v is not None}
 
-@router.get("/hours/by-country")
-def get_resource_hours_by_country(resource: str, project_country: str) -> float:
-    """GET /schedule/hours/by-country?resource=...&project_country=..."""
-    return schedule_service.get_total_hours_by_country(resource, project_country)
-
-
-@router.get("/hours/by-location-type")
-def get_resource_hours_by_location_type(resource: str, remote_or_onsite: str) -> float:
-    """GET /schedule/hours/by-location-type?resource=...&remote_or_onsite=..."""
-    return schedule_service.get_total_hours_by_location_type(resource, remote_or_onsite)
+    return schedule_service.get_total_hours_dynamic(resource, **attribute_filters)
