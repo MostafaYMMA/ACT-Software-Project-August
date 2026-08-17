@@ -37,3 +37,18 @@ def get_by_auth_id(auth_id: str) -> PM:
         raise HTTPException(status_code=404, detail="PM not found")
 
     return PM(**pm)
+
+
+from models.pm import PMCreate  # add to the existing "from models.pm import PM" line instead
+
+def create_pm(new_pm: PMCreate, requesting_pm: PM) -> PM:
+    """Admin-only: create a new PM record."""
+    if not requesting_pm.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+
+    existing = pm_repository.get_by_email(new_pm.email)
+    if existing is not None:
+        raise HTTPException(status_code=409, detail="A PM with this email already exists")
+
+    created = pm_repository.create(new_pm.model_dump())
+    return PM(**created)
