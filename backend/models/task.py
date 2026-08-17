@@ -15,8 +15,8 @@ class TaskFields(BaseModel):
     Excel/email columns:
 
     supplier name, resource, resource start, resource end, hours allocated,
-    project_number, task_number, pm, resource manager, project_status,
-    project_country, remote_onsite, brand, po, sow, rate_type
+    project_number, project_name, task_number, pm, resource manager,
+    project_status, project_country, remote_onsite, brand, po, sow, rate_type
     """
 
     supplier_name: str
@@ -25,6 +25,7 @@ class TaskFields(BaseModel):
     resource_end: date
     hours_allocated: float
     project_number: str
+    project_name: str | None = None
     task_number: str
     pm: str | None = None
     resource_manager: str | None = None
