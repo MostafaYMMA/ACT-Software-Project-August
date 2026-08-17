@@ -51,3 +51,4 @@ def get_pm_tasks(pm_id: int):
     """GET /pms/{pm_id}/tasks — return all tasks assigned to this PM."""
     pm_service.get_pm(pm_id)  # confirms PM exists, raises 404 if not
     return task_service.get_tasks_for_pm(pm_id)
+
