@@ -78,3 +78,14 @@ def claim_task(task_id: int, pm_id: int) -> dict | None:
         .execute()
     )
     return resp.data[0] if resp.data else None
+
+def query_by_pm(pm_id: int) -> list[dict]:
+    """Fetch all tasks assigned to a specific PM."""
+    supabase = get_supabase()
+    response = (
+        supabase.table("tasks")
+        .select("*")
+        .eq("assigned_pm_id", pm_id)
+        .execute()
+    )
+    return response.data
