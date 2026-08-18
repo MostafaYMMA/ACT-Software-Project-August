@@ -40,3 +40,28 @@ def get_resource_details(
         )
 
     return rows
+
+@router.get("/filter", response_model=list[str])
+def list_resources_by_attributes(
+    brand: str | None = None,
+    rate_type: str | None = None,
+    project_country: str | None = None,
+    remote_or_onsite: str | None = None,
+    project_number: str | None = None,
+    project_name: str | None = None,
+    pm: str | None = None,
+    resource_manager: str | None = None,
+    current_pm: PM = Depends(get_current_pm),
+) -> list[str]:
+    """
+    GET /api/v1/resources/filter?brand=...&rate_type=...
+    All filters optional — combine any number. Returns distinct resource names.
+    """
+    attribute_filters = {
+        "brand": brand, "rate_type": rate_type, "project_country": project_country,
+        "remote_or_onsite": remote_or_onsite, "project_number": project_number,
+        "project_name": project_name, "pm": pm, "resource_manager": resource_manager,
+    }
+    attribute_filters = {k: v for k, v in attribute_filters.items() if v is not None}
+
+    return resource_service.list_resources_by_attributes(**attribute_filters)

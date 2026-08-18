@@ -37,3 +37,13 @@ def get_rows_by_resource(resource_name: str) -> list[dict]:
         .execute()
     )
     return response.data or []
+
+
+def get_rows_by_attributes(**filters) -> list[dict]:
+    """Fetch the resource column for rows matching any given attribute filters."""
+    query = get_supabase().table(TABLE).select("resource")
+    for column, value in filters.items():
+        if value is not None:
+            query = query.eq(column, value)
+    response = query.order("resource").execute()
+    return response.data or []
