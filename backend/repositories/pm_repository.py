@@ -55,14 +55,3 @@ def list_all() -> list[dict]:
         .execute()
     )
     return response.data
-
-
-def create(pm_data: dict) -> dict:
-    """Insert a new PM row. Pure data access — no business rules here."""
-    supabase = get_supabase()
-    response = (
-        supabase.table(TABLE)
-        .insert(pm_data)
-        .execute()
-    )
-    return response.data[0]

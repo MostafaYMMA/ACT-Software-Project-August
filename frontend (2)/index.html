@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign in · ACT</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="auth-shell">
+
+  <section class="auth-cover">
+    <div class="auth-brand"><span class="mark">A</span> ACT</div>
+
+    <div class="auth-cover-body">
+      <h1 class="display">Keep the ledger of your work, honestly.</h1>
+      <p>One page for every task you own — what's open, what's done, and what's slipping. No noise, just the record.</p>
+    </div>
+
+    <div class="ledger-tally">
+      <div><strong>03</strong>menu sections</div>
+      <div><strong>&infin;</strong>tasks tracked</div>
+      <div><strong>100%</strong>yours</div>
+    </div>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-card">
+      <div class="eyebrow">Welcome back</div>
+      <h2>Sign in</h2>
+      <p class="sub">Enter your email and password to open your dashboard.</p>
+
+      <form id="login-form" novalidate>
+        <div class="field" id="field-email">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" />
+          <div class="error">Enter a valid email address.</div>
+        </div>
+
+        <div class="field" id="field-password">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password" />
+          <div class="error">Enter your password.</div>
+        </div>
+
+        <div id="login-status" class="form-status"></div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top:22px;">Sign in</button>
+      </form>
+
+      <p class="auth-switch">New here? <a href="signup.html">Create an account</a></p>
+    </div>
+  </section>
+
+</div>
+
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>

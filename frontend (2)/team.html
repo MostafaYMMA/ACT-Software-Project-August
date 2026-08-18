@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Team · ACT</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <header class="header-bar">
+    <div class="header-left">
+      <button class="sidebar-toggle" data-sidebar-toggle aria-label="Toggle sidebar">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><path d="M14 9l-2 3 2 3"/></svg>
+      </button>
+      <div class="brand"><span class="mark">A</span><span class="brand-name">ACT</span></div>
+    </div>
+    <div class="header-right">
+      <div class="profile-pill">
+        <div class="avatar" data-user-avatar>—</div>
+        <div class="who">
+          <div class="name" data-user-name>—</div>
+          <div class="role">Manager</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="body-row">
+
+    <div class="sidebar-scrim" data-scrim></div>
+
+    <aside class="sidebar">
+      <ul class="nav-list">
+        <li><a class="nav-link" data-page="dashboard" href="dashboard.html">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg></span>
+          <span class="label">Dashboard</span>
+        </a></li>
+        <li><a class="nav-link" data-page="tasks" href="tasks.html">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/></svg></span>
+          <span class="label">Tasks</span>
+          <span class="count" data-count="tasks">0</span>
+        </a></li>
+        <li><a class="nav-link" data-page="projects" href="projects.html">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></span>
+          <span class="label">Projects</span>
+        </a></li>
+        <li><a class="nav-link" data-page="team" href="team.html">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="8.5" r="2.6"/><path d="M15.8 14.2c2.7.4 4.7 2.4 4.7 5.8"/></svg></span>
+          <span class="label">Employees</span>
+        </a></li>
+        <li><a class="nav-link" data-page="reports" href="reports.html">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg></span>
+          <span class="label">Reports</span>
+        </a></li>
+      </ul>
+
+      <div class="sidebar-bottom">
+        <a class="nav-link" data-page="settings" href="settings.html">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.97 7.97 0 0 0 0-2l2.1-1.6-2-3.4-2.5 1a8 8 0 0 0-1.7-1L14.9 3h-4l-.4 2.9a8 8 0 0 0-1.7 1l-2.5-1-2 3.4L6.5 11a7.97 7.97 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 0 0 1.7 1l.4 2.9h4l.4-2.9a8 8 0 0 0 1.7-1l2.5 1 2-3.4L19.4 13z"/></svg></span>
+          <span class="label">Settings</span>
+        </a>
+        <a class="nav-link" href="#" data-logout>
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></span>
+          <span class="label">Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="content-top">
+        <div class="eyebrow">Who's here</div>
+        <h1>Team</h1>
+      </div>
+
+      <div class="content">
+        <div class="team-grid" id="team-grid"></div>
+      </div>
+    </main>
+
+  </div>
+</div>
+
+<script src="js/app.js?v=2"></script>
+<script src="js/tasks.js?v=2"></script>
+<script src="js/team.js?v=2"></script>
+<script>
+  const user = requireAuth();
+  if(user){
+    initShell('team', user);
+    renderTeam(document.getElementById('team-grid'));
+  }
+</script>
+</body>
+</html>
