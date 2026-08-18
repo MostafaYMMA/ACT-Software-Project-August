@@ -51,18 +51,3 @@ def get_pm_tasks(pm_id: int):
     """GET /pms/{pm_id}/tasks — return all tasks assigned to this PM."""
     pm_service.get_pm(pm_id)  # confirms PM exists, raises 404 if not
     return task_service.get_tasks_for_pm(pm_id)
-
-
-
-from datetime import date
-from models.task import TaskPublic
-
-@router.get("/range", response_model=list[TaskPublic])
-def get_tasks_in_range(start_date: date, end_date: date, pm: str | None = None):
-    """
-    GET /tasks/range?start_date=2026-08-01&end_date=2026-08-17&pm=...
-    Returns every task in that date range, no internal IDs.
-    If pm is given, scoped to just that PM's tasks.
-    """
-    return task_service.get_tasks_in_range(start_date, end_date, pm)
-

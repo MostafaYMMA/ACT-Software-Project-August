@@ -16,18 +16,17 @@ def get_task_by_id(task_id: int) -> dict | None:
     return resp.data if resp else None
 
 
-def find_by_project_and_task_number(project_number: str, task_number: str) -> dict | None:
-    """Look up an existing task by its dedupe key: project_number + task_number.
+def find_by_source_reference(source_reference: str) -> dict | None:
+    """Look up an existing task by the (not-yet-finalized) dedupe key.
 
-    An email referencing an existing task fully overwrites it (CLAUDE.md
-    rule 3) rather than merging - this is how that existing record is found.
+    See CLAUDE.md "Open decisions" - source_reference is a placeholder until
+    the team confirms which field(s) uniquely identify a task record.
     """
     resp = (
         get_supabase()
         .table(TABLE)
         .select("*")
-        .eq("project_number", project_number)
-        .eq("task_number", task_number)
+        .eq("source_reference", source_reference)
         .maybe_single()
         .execute()
     )
@@ -89,20 +88,4 @@ def query_by_pm(pm_id: int) -> list[dict]:
         .eq("assigned_pm_id", pm_id)
         .execute()
     )
-    return response.data
-
-from datetime import date
-
-def query_by_date_range(start_date: date, end_date: date, pm: str | None = None) -> list[dict]:
-    """Fetch tasks where resource_start falls within the given date range."""
-    supabase = get_supabase()
-    query = (
-        supabase.table("tasks")
-        .select("*")
-        .gte("resource_start", start_date.isoformat())
-        .lte("resource_start", end_date.isoformat())
-    )
-    if pm is not None:
-        query = query.eq("pm", pm)
-    response = query.execute()
     return response.data

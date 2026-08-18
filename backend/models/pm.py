@@ -12,12 +12,3 @@ class PM(BaseModel):
     is_admin: bool = False          # ← new field
     name: Optional[str] = None
     created_at: Optional[datetime] = None
-
-class PMCreate(BaseModel):
-    """Payload for admin-only PM creation. auth_id is required because PM
-    accounts are provisioned by the dev team's seed script (Supabase Auth
-    user must already exist) — this endpoint only inserts the pms row."""
-    email: str
-    auth_id: str
-    name: Optional[str] = None
-    is_admin: bool = False
