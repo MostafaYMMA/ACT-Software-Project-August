@@ -79,3 +79,24 @@ def unassign_task(task_id: int, current_pm) -> dict:
 def get_tasks_for_pm(pm_id: int) -> list[Task]:
     """Get all tasks belonging to a specific PM."""
     return [Task(**row) for row in task_repository.query_by_pm(pm_id)]
+
+
+def search_tasks(
+    search_query: str | None = None,
+    from_date: str | None = None,
+    to_date: str | None = None,
+    status: str | None = None,
+) -> list[dict]:
+    """
+    Search tasks by text and date range.
+    
+    Args:
+        search_query: Text to search in task fields
+        from_date: ISO format date (YYYY-MM-DD)
+        to_date: ISO format date (YYYY-MM-DD)
+        status: Filter by status (assigned/unassigned)
+    
+    Returns:
+        List of matching tasks.
+    """
+    return task_repository.search_tasks(search_query, from_date, to_date, status)

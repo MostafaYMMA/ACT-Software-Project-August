@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 
 from api.v1.dependencies import get_current_pm, require_admin
 from models.pm import PM
@@ -9,7 +9,26 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
 @router.get("")
-def list_tasks(current_pm: PM = Depends(get_current_pm)):
+def list_tasks(
+    current_pm: PM = Depends(get_current_pm),
+    search: str | None = Query(None),
+    from_date: str | None = Query(None),
+    to_date: str | None = Query(None),
+    status: str | None = Query(None),
+):
+    """
+    List all tasks with optional search and date filters.
+    
+    Query parameters:
+    - search: Text to search in task title, description, source_reference
+    - from_date: Filter tasks created on or after this date (YYYY-MM-DD)
+    - to_date: Filter tasks created on or before this date (YYYY-MM-DD)
+    - status: Filter by status ('assigned' or 'unassigned')
+    
+    Example: GET /api/v1/tasks?search=onboarding&from_date=2026-08-01&to_date=2026-08-18
+    """
+    if search or from_date or to_date or status:
+        return task_service.search_tasks(search, from_date, to_date, status)
     return task_service.list_tasks()
 
 
