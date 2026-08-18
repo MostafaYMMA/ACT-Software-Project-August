@@ -14,13 +14,16 @@ function relativeDay(ts){
 }
 
 function taskRowHTML(task){
+  const status = task.status || (task.done ? 'completed' : 'active');
+  const proj = task.project || '';
   return `
-    <div class="task-row ${task.done ? 'done' : ''}" data-id="${task.id}">
-      <input type="checkbox" class="stamp" ${task.done ? 'checked' : ''} aria-label="Mark task done" />
+    <div class="task-row ${task.done ? 'done' : ''}" data-id="${task.id}" data-status="${status}">
+      <button class="stamp status-${status}" aria-label="Change task status" data-status="${status}"></button>
       <div class="task-main">
         <div class="task-title">${escapeHTML(task.title)}</div>
         <div class="task-meta">
           <span class="chip ${PRIORITY_CHIP[task.priority]}">${PRIORITY_LABEL[task.priority]}</span>
+          <span class="project">Project: ${escapeHTML(proj || 'No project')}</span>
           <span>added ${relativeDay(task.createdAt)}</span>
         </div>
       </div>
@@ -57,12 +60,25 @@ function renderTaskList(container, email, filterFn, onChange, emptyMessage){
   container.querySelectorAll('.task-row').forEach(row => {
     const id = row.dataset.id;
 
-    row.querySelector('.stamp').addEventListener('change', (e) => {
-      const tasks = Store.getTasks(email);
-      const t = tasks.find(t => t.id === id);
-      if(t){ t.done = e.target.checked; Store.saveTasks(email, tasks); }
-      row.classList.toggle('done', e.target.checked);
-      onChange && onChange();
+    // status popover (handles Active / Paused / Completed)
+    const stamp = row.querySelector('.stamp');
+    stamp.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const currentStatus = row.dataset.status || 'active';
+      createStatusPopover(stamp, currentStatus, (newStatus) => {
+        const tasks = Store.getTasks(email);
+        const t = tasks.find(t => t.id === id);
+        if(!t) return;
+        t.status = newStatus;
+        t.done = (newStatus === 'completed');
+        Store.saveTasks(email, tasks);
+        // update DOM
+        row.dataset.status = newStatus;
+        row.classList.toggle('done', t.done);
+        stamp.classList.remove('status-active','status-paused','status-completed');
+        stamp.classList.add(`status-${newStatus}`);
+        onChange && onChange();
+      });
     });
 
     row.querySelector('.task-delete').addEventListener('click', () => {
@@ -77,6 +93,48 @@ function renderTaskList(container, email, filterFn, onChange, emptyMessage){
   });
 }
 
+/** Create a small status popover next to target element. Calls `onSelect(status)` when chosen. */
+function createStatusPopover(target, currentStatus, onSelect){
+  // remove any existing popover
+  const existing = document.querySelector('.status-popover');
+  if(existing) existing.remove();
+
+  const pop = document.createElement('div');
+  pop.className = 'status-popover';
+  pop.innerHTML = `
+    <button class="status-option" data-value="active"><span class="dot dot-active"></span>Active</button>
+    <button class="status-option" data-value="paused"><span class="dot dot-paused"></span>Paused</button>
+    <button class="status-option" data-value="completed"><span class="dot dot-completed">✓</span>Completed</button>
+  `;
+  document.body.appendChild(pop);
+
+  // position near the target
+  const rect = target.getBoundingClientRect();
+  pop.style.top = `${rect.top + window.scrollY + (rect.height/2) - 28}px`;
+  pop.style.left = `${rect.right + 12 + window.scrollX}px`;
+
+  // animation show
+  requestAnimationFrame(() => pop.classList.add('show'));
+
+  function cleanup(){
+    pop.remove();
+    document.removeEventListener('click', onDocClick, true);
+  }
+
+  function onDocClick(ev){
+    if(!pop.contains(ev.target) && ev.target !== target) cleanup();
+  }
+  document.addEventListener('click', onDocClick, true);
+
+  pop.querySelectorAll('.status-option').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const val = btn.dataset.value;
+      onSelect(val);
+      cleanup();
+    });
+  });
+}
+
 function addTask(email, {title, priority}){
   const tasks = Store.getTasks(email);
   tasks.unshift({
@@ -84,6 +142,8 @@ function addTask(email, {title, priority}){
     title,
     priority,
     done: false,
+    status: 'active',
+    project: '',
     createdAt: Date.now()
   });
   Store.saveTasks(email, tasks);

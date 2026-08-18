@@ -1,11 +1,11 @@
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from api.v1.dependencies import get_current_pm
 from api.v1.routers import pms, resources, schedule, sync, tasks
 from models.pm import PM
-from fastapi.middleware.cors import CORSMiddleware
 
-
+# Runs at http://localhost:8000
 app = FastAPI(title="ACT Software Project - Backend")
 
 app.add_middleware(
@@ -18,6 +18,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 app.include_router(tasks.router, prefix="/api/v1")
 app.include_router(pms.router, prefix="/api/v1")
 app.include_router(sync.router, prefix="/api/v1")
