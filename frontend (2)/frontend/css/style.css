@@ -864,3 +864,145 @@ button{ font-family: inherit; }
 
 /* ---------- settings ---------- */
 .settings-grid{ display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 560px; }
+/* =========================
+   CALENDAR
+   ========================= */
+
+.dashboard-right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.calendar-card {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 18px 0;
+}
+
+.calendar-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.calendar-nav {
+  width: 34px;
+  height: 34px;
+
+  border: 1px solid #eadfd6;
+  border-radius: 8px;
+
+  background: transparent;
+  color: inherit;
+
+  cursor: pointer;
+
+  font-size: 17px;
+
+  transition: all 0.2s ease;
+}
+
+.calendar-nav:hover {
+  background: #ff6b00;
+  border-color: #ff6b00;
+  color: white;
+}
+
+.calendar-weekdays,
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.calendar-weekdays {
+  margin-bottom: 6px;
+}
+
+.calendar-weekdays span {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #8c8178;
+}
+
+.calendar-day {
+  width: 100%;
+  height: 36px;
+
+  border: none;
+  border-radius: 9px;
+
+  background: transparent;
+  color: inherit;
+
+  cursor: pointer;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  transition: all 0.2s ease;
+}
+
+.calendar-day:hover {
+  background: #fff1e6;
+  color: #ff6b00;
+}
+
+.calendar-day.today {
+  background: #ff6b00;
+  color: white;
+  font-weight: 700;
+}
+
+.calendar-day.today:hover {
+  background: #e85f00;
+  color: white;
+}
+
+.calendar-day.selected {
+  outline: 2px solid #ff6b00;
+  outline-offset: -2px;
+}
+
+.calendar-day.empty {
+  pointer-events: none;
+}
+
+
+/* =========================
+   DARK MODE
+   ========================= */
+
+body.dark-mode .calendar-nav {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.dark-mode .calendar-day:hover {
+  background: rgba(255, 107, 0, 0.12);
+  color: #ff7a1a;
+}
+
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 780px) {
+
+  .dashboard-right {
+    gap: 18px;
+  }
+
+  .calendar-day {
+    height: 34px;
+  }
+
+}
