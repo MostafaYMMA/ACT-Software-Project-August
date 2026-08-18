@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Dashboard · ACT</title>
 <link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
 
@@ -71,29 +72,85 @@
 
     <main class="main">
       <div class="content-top">
-        <div class="eyebrow">Overview</div>
-        <h1>Dashboard</h1>
+        <h1>Welcome, <span id="userName">User</span> 👋</h1>
+        <div class="eyebrow">Here's what's happening with your projects today.</div>
       </div>
 
       <div class="content">
         <div class="stat-grid" id="stat-grid"></div>
 
         <div class="two-col">
-          <div class="card card-pad">
-            <div class="card-head">
-              <h2>Recent tasks</h2>
-              <a class="link" href="tasks.html">View all &rarr;</a>
-            </div>
-            <div id="recent-tasks"></div>
-          </div>
 
-          <div class="card card-pad">
-            <div class="card-head">
-              <h2>Open by priority</h2>
-            </div>
-            <div id="priority-bars"></div>
-          </div>
-        </div>
+  <!-- Recent Tasks -->
+  <div class="card card-pad">
+    <div class="card-head">
+      <h2>Recent tasks</h2>
+      <a class="link" href="tasks.html">View all &rarr;</a>
+    </div>
+
+    <div id="recent-tasks"></div>
+  </div>
+
+
+  <!-- Right Column -->
+  <div class="dashboard-right">
+
+    <!-- Open by Priority -->
+    <div class="card card-pad">
+      <div class="card-head">
+        <h2>Open by priority</h2>
+      </div>
+
+      <div id="priority-bars"></div>
+    </div>
+
+
+    <!-- Calendar -->
+    <div class="card card-pad calendar-card">
+
+      <div class="card-head">
+        <h2>Calendar</h2>
+      </div>
+
+      <div class="calendar-header">
+
+        <button
+          type="button"
+          id="prevMonth"
+          class="calendar-nav"
+        >
+          ←
+        </button>
+
+        <h3 id="calendarMonth"></h3>
+
+        <button
+          type="button"
+          id="nextMonth"
+          class="calendar-nav"
+        >
+          →
+        </button>
+
+      </div>
+
+      <div class="calendar-weekdays">
+        <span>Sun</span>
+        <span>Mon</span>
+        <span>Tue</span>
+        <span>Wed</span>
+        <span>Thu</span>
+        <span>Fri</span>
+        <span>Sat</span>
+      </div>
+
+      <div id="calendarDays" class="calendar-days"></div>
+
+    </div>
+
+  </div>
+
+</div>
       </div>
     </main>
 
@@ -102,31 +159,87 @@
 
 <script src="js/app.js"></script>
 <script src="js/tasks.js"></script>
+<script src="js/calendar.js"></script>
 <script>
   const user = requireAuth();
   if(user){
     initShell('dashboard', user);
-
+    document.getElementById('userName').textContent = user.name || user.email || 'User';
     function paint(){
       const s = taskStats(user.email);
 
       document.getElementById('stat-grid').innerHTML = `
-        <div class="stat-tile">
-          <div class="label">Open tasks</div>
-          <div class="value">${s.open}</div>
-          <div class="delta">${s.total} total tracked</div>
-        </div>
-        <div class="stat-tile">
-          <div class="label">Completed</div>
-          <div class="value">${s.done}</div>
-          <div class="delta up">${s.completion}% completion rate</div>
-        </div>
-        <div class="stat-tile">
-          <div class="label">High priority</div>
-          <div class="value">${s.byPriority.high}</div>
-          <div class="delta ${s.byPriority.high ? 'down' : ''}">${s.byPriority.high ? 'needs attention' : 'all clear'}</div>
-        </div>
-      `;
+
+  <!-- Total Tasks -->
+  <div class="stat-tile">
+    <div class="stat-info">
+      <i class="fa-solid fa-list-ul"></i>
+    </div>
+
+      <div class="label">Total tasks</div>
+      <div class="value">${s.total}</div>
+      <div class="delta">
+        ${s.total} total tracked
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- In Progress -->
+  <div class="stat-tile">
+
+    <div class="stat-icon progress-icon">
+      <i class="fa-solid fa-hourglass-half"></i>
+    </div>
+
+    <div class="stat-info">
+      <div class="label">In Progress</div>
+      <div class="value">${s.open}</div>
+      <div class="delta">
+        ${s.open} tasks in progress
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- Completed -->
+  <div class="stat-tile">
+
+    <div class="stat-icon completed-icon">
+      <i class="fa-solid fa-circle-check"></i>
+    </div>
+
+    <div class="stat-info">
+      <div class="label">Completed</div>
+      <div class="value">${s.done}</div>
+      <div class="delta up">
+        ${s.completion}% completion rate
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- High Priority -->
+  <div class="stat-tile">
+
+    <div class="stat-icon priority-icon">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+
+    <div class="stat-info">
+      <div class="label">High priority</div>
+      <div class="value">${s.byPriority.high}</div>
+      <div class="delta ${s.byPriority.high ? 'down' : ''}">
+        ${s.byPriority.high ? 'needs attention' : 'all clear'}
+      </div>
+    </div>
+
+  </div>
+
+`;
 
       renderTaskList(
         document.getElementById('recent-tasks'),
@@ -156,5 +269,10 @@
     paint();
   }
 </script>
+<!-- <script>
+  const userName = localStorage.getItem("username");
+
+  document.getElementById("userName").textContent = userName || "User";
+</script> -->
 </body>
 </html>

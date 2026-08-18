@@ -8,6 +8,7 @@ const Store = {
   USERS_KEY: 'act_users',
   SESSION_KEY: 'act_session',
   SIDEBAR_KEY: 'act_sidebar_collapsed',
+  THEME_KEY: 'act_theme',
 
   getUsers(){
     try{ return JSON.parse(localStorage.getItem(this.USERS_KEY)) || []; }
@@ -57,6 +58,67 @@ const Store = {
   }
 };
 
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+function initTheme(){
+  const savedTheme = localStorage.getItem(Store.THEME_KEY);
+
+  if(savedTheme === 'dark'){
+    document.body.classList.add('dark-mode');
+  }
+}
+
+function createThemeToggle(){
+
+  const headerRight = document.querySelector('.header-right');
+
+  if(!headerRight) return;
+
+  if(headerRight.querySelector('.theme-toggle')) return;
+
+  const button = document.createElement('button');
+
+  button.type = 'button';
+  button.className = 'theme-toggle';
+
+  button.setAttribute(
+    'aria-label',
+    'Toggle dark mode'
+  );
+
+  updateThemeButton(button);
+
+  button.addEventListener('click', () => {
+
+    document.body.classList.toggle('dark-mode');
+
+    const isDark =
+      document.body.classList.contains('dark-mode');
+
+    localStorage.setItem(
+      Store.THEME_KEY,
+      isDark ? 'dark' : 'light'
+    );
+
+    updateThemeButton(button);
+  });
+
+  headerRight.insertBefore(
+    button,
+    headerRight.firstElementChild
+  );
+}
+
+function updateThemeButton(button){
+
+  const isDark =
+    document.body.classList.contains('dark-mode');
+
+  button.textContent = isDark ? '☀️' : '🌙';
+}
+
 /** Redirect to login if no session; call at top of protected pages. */
 function requireAuth(){
   const user = Store.currentUser();
@@ -74,6 +136,9 @@ function initials(name){
 
 /** Wires header profile pill, active nav link, logout, and the collapsible sidebar. */
 function initShell(activePage, user){
+   // Initialize dark mode
+  initTheme();
+  createThemeToggle();
   document.querySelectorAll('.nav-link').forEach(link => {
     link.classList.toggle('active', link.dataset.page === activePage);
   });
