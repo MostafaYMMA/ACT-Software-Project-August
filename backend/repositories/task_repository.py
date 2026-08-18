@@ -90,3 +90,19 @@ def query_by_pm(pm_id: int) -> list[dict]:
         .execute()
     )
     return response.data
+
+from datetime import date
+
+def query_by_date_range(start_date: date, end_date: date, pm: str | None = None) -> list[dict]:
+    """Fetch tasks where resource_start falls within the given date range."""
+    supabase = get_supabase()
+    query = (
+        supabase.table("tasks")
+        .select("*")
+        .gte("resource_start", start_date.isoformat())
+        .lte("resource_start", end_date.isoformat())
+    )
+    if pm is not None:
+        query = query.eq("pm", pm)
+    response = query.execute()
+    return response.data

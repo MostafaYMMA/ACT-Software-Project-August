@@ -75,3 +75,11 @@ def unassign_task(task_id: int, current_pm) -> dict:
 def get_tasks_for_pm(pm_id: int) -> list[Task]:
     """Get all tasks belonging to a specific PM."""
     return [Task(**row) for row in task_repository.query_by_pm(pm_id)]
+
+from datetime import date
+from models.task import TaskPublic
+
+def get_tasks_in_range(start_date: date, end_date: date, pm: str | None = None) -> list[TaskPublic]:
+    """Tasks (with resource/hours/etc.) within a date range, no internal IDs, optionally scoped to one PM."""
+    rows = task_repository.query_by_date_range(start_date, end_date, pm)
+    return [TaskPublic(**row) for row in rows]

@@ -61,3 +61,8 @@ class Task(TaskFields):
     source_email_id: str
     created_at: datetime
     updated_at: datetime
+
+
+class TaskPublic(TaskFields):
+    """Task shape for PM-facing responses — no internal IDs."""
+    status: TaskStatus
