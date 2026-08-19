@@ -3,6 +3,7 @@
 from fastapi import HTTPException
 from models.pm import PM
 from repositories import pm_repository
+from datetime import datetime, timezone, timedelta
 
 
 def get_pm(pm_id: int) -> PM:
@@ -53,6 +54,15 @@ def create_pm(new_pm: PMCreate, requesting_pm: PM) -> PM:
     created = pm_repository.create(new_pm.model_dump())
     return PM(**created)
 
+def record_heartbeat(pm_id: int) -> None:
+    pm_repository.update_last_seen(pm_id)
 
+
+def is_online(pm_id: int) -> bool:
+    pm = pm_repository.get_by_id(pm_id)
+    if pm is None or pm.get("last_seen") is None:
+        return False
+    last_seen = datetime.fromisoformat(pm["last_seen"])
+    return datetime.now(timezone.utc) - last_seen < timedelta(seconds=60)
 
 

@@ -3,7 +3,8 @@
 Repositories are pure data access — no business decisions (that's services/).
 """
 from repositories.supabase_client import get_supabase
-
+from datetime import datetime, timezone
+ 
 TABLE = "pms"
 
 
@@ -66,7 +67,11 @@ def create(pm_data: dict) -> dict:
         .execute()
     )
     return response.data[0]
-
+    def update_last_seen(pm_id: int) -> None:
+     supabase = get_supabase()
+    supabase.table(TABLE).update(
+        {"last_seen": datetime.now(timezone.utc).isoformat()}
+    ).eq("id", pm_id).execute()
 
 
 
