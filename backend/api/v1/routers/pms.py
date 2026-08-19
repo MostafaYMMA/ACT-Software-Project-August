@@ -30,3 +30,4 @@ def add_pm(new_pm: PMCreate, current_pm: PM = Depends(require_admin)):
     must already exist — that's provisioned separately by the seed script.
     """
     return pm_service.create_pm(new_pm, current_pm)
+
