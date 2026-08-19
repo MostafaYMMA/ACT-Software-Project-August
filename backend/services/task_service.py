@@ -76,6 +76,29 @@ def unassign_task(task_id: int, current_pm) -> dict:
         raise ValueError("Task could not be unassigned")
     return updated
 
+def reassign_task(task_id: int, new_pm_id: int, current_pm) -> dict:
+    """Admin-only: move a task to a different PM, no matter who (if anyone)
+    currently holds it. Router must enforce admin access via require_admin;
+    this function re-checks so the rule holds even if it's ever called from
+    somewhere else.
+    """
+    if not current_pm.is_admin:
+        raise PermissionError("Only an admin can transfer a task between PMs")
+
+    task = task_repository.get_task_by_id(task_id)
+    if task is None:
+        raise ValueError("Task not found")
+
+    new_pm = pm_repository.get_by_id(new_pm_id)
+    if new_pm is None:
+        raise ValueError("Target PM not found")
+
+    updated = task_repository.reassign_task(task_id, new_pm_id)
+    if updated is None:
+        raise ValueError("Task could not be reassigned")
+    return updated
+
+
 def get_tasks_for_pm(pm_id: int) -> list[Task]:
     """Get all tasks belonging to a specific PM."""
     return [Task(**row) for row in task_repository.query_by_pm(pm_id)]
