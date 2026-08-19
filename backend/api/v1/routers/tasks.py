@@ -51,3 +51,12 @@ def get_pm_tasks(pm_id: int):
     """GET /pms/{pm_id}/tasks — return all tasks assigned to this PM."""
     pm_service.get_pm(pm_id)  # confirms PM exists, raises 404 if not
     return task_service.get_tasks_for_pm(pm_id)
+
+
+@router.get("/projects")
+def get_projects(assigned_pm_id: int | None = None) -> list[dict]:
+    """
+    GET /tasks/projects                     — all tasks (admin view)
+    GET /tasks/projects?assigned_pm_id=5     — only tasks this PM has claimed
+    """
+    return task_service.list_projects(assigned_pm_id)

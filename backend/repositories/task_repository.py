@@ -89,3 +89,13 @@ def query_by_pm(pm_id: int) -> list[dict]:
         .execute()
     )
     return response.data
+
+
+def get_projects_rows(assigned_pm_id: int | None = None) -> list[dict]:
+    """Fetch project_name, project_number, task_number, and pm, optionally filtered by assigned_pm_id."""
+    supabase = get_supabase()
+    query = supabase.table("tasks").select("project_name, project_number, task_number, pm")
+    if assigned_pm_id is not None:
+        query = query.eq("assigned_pm_id", assigned_pm_id)
+    response = query.execute()
+    return response.data    
