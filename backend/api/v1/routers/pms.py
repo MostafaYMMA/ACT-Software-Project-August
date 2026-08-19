@@ -31,3 +31,12 @@ def add_pm(new_pm: PMCreate, current_pm: PM = Depends(require_admin)):
     """
     return pm_service.create_pm(new_pm, current_pm)
 
+@router.post("/heartbeat")
+def heartbeat(current_pm: PM = Depends(get_current_pm)):
+    pm_service.record_heartbeat(current_pm.id)
+    return {"status": "ok"}
+
+
+@router.get("/{pm_id}/online")
+def check_online(pm_id: int) -> bool:
+    return pm_service.is_online(pm_id)

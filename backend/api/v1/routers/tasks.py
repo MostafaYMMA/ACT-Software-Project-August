@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from api.v1.dependencies import get_current_pm, require_admin
 from models.pm import PM
 from services import task_service,pm_service
-from models.task import Task
+from models.task import Task ,TaskReassign
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 

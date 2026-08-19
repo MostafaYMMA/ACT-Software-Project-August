@@ -3,14 +3,15 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
-
+from uuid import UUID
 
 class PM(BaseModel):
     id: int
     email: str
-    auth_id: str          # links this PM row to their Supabase Auth login
-    is_admin: bool = False          # ← new field
+    auth_id: UUID
+    is_admin: bool = False
     name: Optional[str] = None
+    username: Optional[str] = None
     created_at: Optional[datetime] = None
 
 class PMCreate(BaseModel):
@@ -21,5 +22,4 @@ class PMCreate(BaseModel):
     auth_id: str
     name: Optional[str] = None
     is_admin: bool = False
-
-
+    
