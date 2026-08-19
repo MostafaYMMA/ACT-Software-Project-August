@@ -46,6 +46,18 @@ def unassign_task(task_id: int, current_pm: PM = Depends(get_current_pm)):
     except PermissionError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 
+
+@router.patch("/{task_id}/reassign")
+def reassign_task(task_id: int, body: TaskReassign, current_pm: PM = Depends(require_admin)):
+    """Admin-only: transfer a task from whichever PM (or nobody) currently
+    holds it to a different PM specified by body.new_pm_id."""
+    try:
+        return task_service.reassign_task(task_id, body.new_pm_id, current_pm)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except PermissionError as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+
 @router.get("/{pm_id}/tasks", response_model=list[Task])
 def get_pm_tasks(pm_id: int):
     """GET /pms/{pm_id}/tasks — return all tasks assigned to this PM."""

@@ -36,6 +36,13 @@ class TaskUpdate(BaseModel):
     assigned_pm_id: int | None = None
 
 
+class TaskReassign(BaseModel):
+    """Admin-only request body: move a task from whichever PM (or nobody)
+    currently holds it to a different, specific PM."""
+
+    new_pm_id: int
+
+    
 class Task(BaseModel):
     id: int
     title: str
