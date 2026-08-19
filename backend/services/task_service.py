@@ -79,3 +79,12 @@ def unassign_task(task_id: int, current_pm) -> dict:
 def get_tasks_for_pm(pm_id: int) -> list[Task]:
     """Get all tasks belonging to a specific PM."""
     return [Task(**row) for row in task_repository.query_by_pm(pm_id)]
+
+
+def list_projects(assigned_pm_id: int | None = None) -> list[dict]:
+    """
+    List of tasks (project_name, project_number, task_number, pm).
+    If assigned_pm_id is given, only tasks claimed by that PM.
+    If omitted, every task (admin view).
+    """
+    return task_repository.get_projects_rows(assigned_pm_id)
