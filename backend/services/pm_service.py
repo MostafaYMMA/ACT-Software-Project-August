@@ -54,6 +54,31 @@ def create_pm(new_pm: PMCreate, requesting_pm: PM) -> PM:
     created = pm_repository.create(new_pm.model_dump())
     return PM(**created)
 
+def set_admin_status(pm_id: int, is_admin: bool, requesting_pm: PM) -> PM:
+    """Admin-only: promote a PM to admin, or demote them back to a regular PM.
+
+    Used for both "promote user" (is_admin=True) and, symmetrically, revoking
+    admin rights (is_admin=False) — same rule, same guard rails.
+    """
+    if not requesting_pm.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+
+    target = pm_repository.get_by_id(pm_id)
+    if target is None:
+        raise HTTPException(status_code=404, detail="PM not found")
+
+    # Don't let the last admin accidentally demote themselves and lock
+    # everyone out of admin-only endpoints.
+    if pm_id == requesting_pm.id and not is_admin:
+        raise HTTPException(status_code=400, detail="You cannot remove your own admin access")
+
+    updated = pm_repository.update(pm_id, {"is_admin": is_admin})
+    if updated is None:
+        raise HTTPException(status_code=404, detail="PM not found")
+
+    return PM(**updated)
+
+
 def record_heartbeat(pm_id: int) -> None:
     pm_repository.update_last_seen(pm_id)
 

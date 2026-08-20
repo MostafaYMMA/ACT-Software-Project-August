@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends
 
 from api.v1.dependencies import get_current_pm, require_admin
-from models.pm import PM, PMCreate
+from models.pm import PM, PMCreate, PMAdminUpdate
 from services import pm_service
 
 router = APIRouter(prefix="/pms", tags=["pms"])
@@ -30,6 +30,18 @@ def add_pm(new_pm: PMCreate, current_pm: PM = Depends(require_admin)):
     must already exist — that's provisioned separately by the seed script.
     """
     return pm_service.create_pm(new_pm, current_pm)
+
+
+@router.patch("/{pm_id}/admin", response_model=PM)
+def set_admin_status(
+    pm_id: int,
+    payload: PMAdminUpdate,
+    current_pm: PM = Depends(require_admin),
+):
+    """PATCH /pms/{pm_id}/admin — admin-only. Promote (is_admin: true, the
+    default) or demote (is_admin: false) an existing PM."""
+    return pm_service.set_admin_status(pm_id, payload.is_admin, current_pm)
+
 
 @router.post("/heartbeat")
 def heartbeat(current_pm: PM = Depends(get_current_pm)):
