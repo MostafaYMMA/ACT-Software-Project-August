@@ -79,17 +79,18 @@ def claim_task(task_id: int, pm_id: int) -> dict | None:
     )
     return resp.data[0] if resp.data else None
 
-def reassign_task(task_id: int, new_pm_id: int) -> dict | None:
+def reassign_task(task_id: int, new_pm_id: int, new_pm_name: str) -> dict | None:
     """Move a task to a different PM, regardless of its current status/owner.
 
     Unlike claim_task, this is not conditional on the task being unassigned -
     it's an admin override, so it always sets status back to 'assigned' under
-    the new owner.
+    the new owner. Also updates the denormalized "pm" name column so it
+    stays in sync with assigned_pm_id.
     """
     resp = (
         get_supabase()
         .table(TABLE)
-        .update({"status": "assigned", "assigned_pm_id": new_pm_id})
+        .update({"status": "assigned", "assigned_pm_id": new_pm_id, "pm": new_pm_name})
         .eq("id", task_id)
         .execute()
     )

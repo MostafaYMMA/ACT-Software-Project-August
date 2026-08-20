@@ -93,7 +93,7 @@ def reassign_task(task_id: int, new_pm_id: int, current_pm) -> dict:
     if new_pm is None:
         raise ValueError("Target PM not found")
 
-    updated = task_repository.reassign_task(task_id, new_pm_id)
+    updated = task_repository.reassign_task(task_id, new_pm_id, new_pm["name"])
     if updated is None:
         raise ValueError("Task could not be reassigned")
     return updated
