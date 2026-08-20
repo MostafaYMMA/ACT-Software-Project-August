@@ -200,8 +200,12 @@ function initShell(activePage, user){
    // Initialize dark mode
   initTheme();
   createThemeToggle();
+
+  const sidebarPage = ['projects', 'available-projects', 'my-projects'].includes(activePage) ? 'projects' : activePage;
   document.querySelectorAll('.nav-link').forEach(link => {
-    link.classList.toggle('active', link.dataset.page === activePage);
+    const isProjectsGroup = link.dataset.page === 'projects' || link.getAttribute('data-projects-toggle') !== null;
+    const shouldBeActive = link.dataset.page === activePage || (sidebarPage === 'projects' && isProjectsGroup);
+    link.classList.toggle('active', shouldBeActive);
   });
 
   const nameEl = document.querySelector('[data-user-name]');
@@ -216,10 +220,11 @@ function initShell(activePage, user){
       window.location.href = 'index.html';
     });
   });
-initSidebarToggle();
-const userInitials = resolveProjectManager(user);
-updateNavCounts(user.email, userInitials);
-initNotifications(user);
+  initSidebarToggle();
+  initProjectsDropdown();
+  const userInitials = resolveProjectManager(user);
+  updateNavCounts(user.email, userInitials);
+  initNotifications(user);
 }
 
 /** Desktop: collapses sidebar to an icon rail. Mobile: opens/closes an overlay drawer. */
@@ -277,6 +282,37 @@ function updateNavCounts(email, userInitials){
   const openCountEl = document.querySelector('[data-count="tasks"]');
   if(openCountEl) openCountEl.textContent = open;
 }
+
+function initProjectsDropdown(){
+  const toggle = document.querySelector('[data-projects-toggle]');
+  const submenu = document.querySelector('[data-projects-submenu]');
+
+  if(!toggle || !submenu) return;
+  if(toggle.dataset.bound === 'true') return;
+
+  toggle.dataset.bound = 'true';
+  const shouldOpen = !window.location.pathname.endsWith('tasks.html') && !window.location.pathname.endsWith('dashboard.html');
+  if(shouldOpen){
+    submenu.classList.add('open');
+    toggle.classList.add('expanded');
+  }
+
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    const isOpen = submenu.classList.toggle('open');
+    toggle.classList.toggle('expanded', isOpen);
+  });
+
+  const currentPage = window.location.pathname.split('/').pop();
+  document.querySelectorAll('[data-submenu-page]').forEach(link => link.classList.remove('active'));
+
+  if(currentPage === 'available-projects.html'){
+    document.querySelector('[data-submenu-page="available"]')?.classList.add('active');
+  } else if(currentPage === 'my-projects.html'){
+    document.querySelector('[data-submenu-page="my"]')?.classList.add('active');
+  }
+}
+
 function initNotifications(user){
 
   const headerRight = document.querySelector('.header-right');
@@ -291,7 +327,7 @@ function initNotifications(user){
   container.innerHTML = `
     <button class="notification-button" type="button">
       <span class="notification-icon">🔔</span>
-      <span class="notification-count"></span>
+      <span class="notification-count" style="display:none"></span>
     </button>
 
     <div class="notification-box">
@@ -321,57 +357,13 @@ function initNotifications(user){
     box.classList.toggle('show');
   });
 
-  async function loadNotifications(){
+  const demoNotifications = [
+    'Project review scheduled for Friday',
+    'Team standup reminder at 2:00 PM',
+    'Draft status update ready to share'
+  ];
 
-    try{
-
-      const response = await fetch(
-        `/api/notifications?email=${encodeURIComponent(user.email)}`
-      );
-
-      if(!response.ok) return;
-
-      const notifications = await response.json();
-
-      list.innerHTML = '';
-
-      if(!notifications.length){
-
-        list.innerHTML = `
-          <div class="notification-empty">
-            No new notifications
-          </div>
-        `;
-
-        count.style.display = 'none';
-
-        return;
-      }
-
-      count.textContent = notifications.length;
-      count.style.display = 'flex';
-
-      notifications.forEach(notification => {
-
-        const item = document.createElement('div');
-
-        item.className = 'notification-item';
-
-        item.textContent = notification.message;
-
-        list.appendChild(item);
-
-      });
-
-    }catch(error){
-
-      console.log('Notifications could not be loaded');
-
-    }
-
-  }
-
-  loadNotifications();
-
-  setInterval(loadNotifications, 5000);
+  count.textContent = demoNotifications.length;
+  count.style.display = 'flex';
+  list.innerHTML = demoNotifications.map(item => `<div class="notification-item">${item}</div>`).join('');
 }

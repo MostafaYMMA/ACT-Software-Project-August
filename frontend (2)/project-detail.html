@@ -33,8 +33,14 @@
         <ul class="nav-list">
           <li><a class="nav-link" data-page="dashboard" href="dashboard.html"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg></span><span class="label">Dashboard</span></a></li>
           <li><a class="nav-link" data-page="tasks" href="tasks.html"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/></svg></span><span class="label">Tasks</span><span class="count" data-count="tasks">0</span></a></li>
-          <li><a class="nav-link" data-page="projects" href="projects.html"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></span><span class="label">Projects</span></a></li>
-          <li><a class="nav-link" data-page="team" href="team.html"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="8.5" r="2.6"/><path d="M15.8 14.2c2.7.4 4.7 2.4 4.7 5.8"/></svg></span><span class="label">Employees</span></a></li>
+          <li class="nav-group">
+            <a class="nav-link" href="#" data-projects-toggle><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></span><span class="label">Projects</span><span class="chevron">⌄</span></a>
+            <ul class="nav-submenu" data-projects-submenu>
+              <li><a class="nav-submenu-link" href="available-projects.html" data-submenu-page="available">Available Projects</a></li>
+              <li><a class="nav-submenu-link" href="my-projects.html" data-submenu-page="my">My Projects</a></li>
+            </ul>
+          </li>
+          <li><a class="nav-link" data-page="team" href="team.html"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="8.5" r="2.6"/><path d="M15.8 14.2c2.7.4 4.7 2.4 4.7 5.8"/></svg></span><span class="label">Resource</span></a></li>
           <li><a class="nav-link" data-page="reports" href="reports.html"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg></span><span class="label">Reports</span></a></li>
         </ul>
 

@@ -1,3 +1,7 @@
+# dont remove this
+# python -m http.server 8765 --directory "frontend (2)"
+# http://127.0.0.1:8765/
+
 from fastapi import Depends, FastAPI, Form, HTTPException
 from supabase import create_client
 
