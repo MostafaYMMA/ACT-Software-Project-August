@@ -20,6 +20,13 @@ class Settings(BaseSettings):
     # --- Supabase Auth (JWT verification) ---
     supabase_jwt_secret: str | None = None
 
+    # --- Environment ---
+    environment: str = "development"  # "production" disables /dev/login
+
+    # --- Dev-only test login (Swagger convenience, see /dev/login) ---
+    dev_test_user_email: str | None = None
+    dev_test_user_password: str | None = None
+
     # --- Microsoft Graph (app-only auth against the shared mailbox) ---
     ms_tenant_id: str | None = None
     ms_client_id: str | None = None
