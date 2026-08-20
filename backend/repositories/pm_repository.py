@@ -67,12 +67,27 @@ def create(pm_data: dict) -> dict:
         .execute()
     )
     return response.data[0]
-    def update_last_seen(pm_id: int) -> None:
-     supabase = get_supabase()
+
+
+def update_last_seen(pm_id: int) -> None:
+    supabase = get_supabase()
     supabase.table(TABLE).update(
         {"last_seen": datetime.now(timezone.utc).isoformat()}
     ).eq("id", pm_id).execute()
 
 
+def update(pm_id: int, fields: dict) -> dict | None:
+    """Update arbitrary columns on a PM row (e.g. {'is_admin': True}).
 
+    Pure data access — the decision of *whether* someone is allowed to make
+    this change belongs in services/pm_service.py, not here.
+    """
+    supabase = get_supabase()
+    response = (
+        supabase.table(TABLE)
+        .update(fields)
+        .eq("id", pm_id)
+        .execute()
+    )
+    return response.data[0] if response.data else None
 

@@ -23,3 +23,17 @@ class PMCreate(BaseModel):
     name: Optional[str] = None
     is_admin: bool = False
     
+
+class PMAdminUpdate(BaseModel):
+    """Payload for admin-only promote/demote. is_admin defaults to True so a
+    plain {} body on the "promote" endpoint does the expected thing."""
+    is_admin: bool = True
+
+
+
+
+
+
+PM.model_rebuild()
+PMCreate.model_rebuild()
+PMAdminUpdate.model_rebuild()
