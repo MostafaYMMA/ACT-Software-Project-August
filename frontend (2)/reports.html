@@ -96,10 +96,25 @@
           </div>
         </div>
 
-        <div class="card card-pad grid-gap">
-          <div class="card-head"><h2>Tasks added this week</h2></div>
-          <div id="week-bars"></div>
-        </div>
+    <div class="two-col grid-gap">
+  <div class="card card-pad">
+    <div class="card-head">
+      <h2 id="calendar-title">Calendar</h2>
+      <div class="calendar-nav">
+        <button class="cal-btn" id="cal-prev">‹</button>
+        <button class="cal-btn" id="cal-today">Today</button>
+        <button class="cal-btn" id="cal-next">›</button>
+      </div>
+    </div>
+    <div class="calendar-weekdays" id="calendar-weekdays"></div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+  </div>
+
+  <div class="card card-pad">
+    <div class="card-head"><h2 id="month-stats-title">This Month</h2></div>
+    <div id="month-stats"></div>
+  </div>
+</div>
       </div>
     </main>
 
@@ -148,28 +163,119 @@
     document.getElementById('completion-sub').textContent = `${s.done} of ${s.total} tasks done`;
     document.getElementById('completion-fill').style.width = s.completion + '%';
 
-    const tasks = Store.getTasks(user.email);
-    const days = [];
-    for(let i = 6; i >= 0; i--){
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      d.setHours(0,0,0,0);
-      days.push(d);
-    }
-    const counts = days.map(d => {
-      const next = new Date(d); next.setDate(d.getDate() + 1);
-      return tasks.filter(t => t.createdAt >= d.getTime() && t.createdAt < next.getTime()).length;
-    });
-    const weekMax = Math.max(1, ...counts);
-    const dayLabels = days.map(d => d.toLocaleDateString(undefined, { weekday: 'short' }));
+    // ===== Calendar =====
+    const allTasks = Store.getTasks(user.email);
+    let calDate = new Date();
+    calDate.setDate(1);
 
-    document.getElementById('week-bars').innerHTML = dayLabels.map((label, i) => `
-      <div class="bar-row">
-        <div class="bar-label">${label}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${(counts[i] / weekMax) * 100}%"></div></div>
-        <div class="bar-value">${counts[i]}</div>
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const weekdayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    const weekdaysEl = document.getElementById('calendar-weekdays');
+    weekdaysEl.style.cssText = 'display:grid; grid-template-columns:repeat(7,1fr); margin-top:12px; font-size:12px; color:#999; text-align:center;';
+    weekdaysEl.innerHTML = weekdayNames.map(w => `<div>${w}</div>`).join('');
+
+    function tasksOnDay(dayStart){
+      const dayEnd = new Date(dayStart); dayEnd.setDate(dayStart.getDate() + 1);
+      return allTasks.filter(t => t.createdAt >= dayStart.getTime() && t.createdAt < dayEnd.getTime());
+    }
+    function renderMonthStats(year, month){
+  const monthStart = new Date(year, month, 1).getTime();
+  const monthEnd = new Date(year, month + 1, 1).getTime();
+
+  const monthTasks = allTasks.filter(t => t.createdAt >= monthStart && t.createdAt < monthEnd);
+const doneTasks = monthTasks.filter(t =>
+  t.status === 'done' ||
+  t.status === 'Done' ||
+  t.status === 'completed' ||
+  t.completed === true ||
+  t.done === true ||
+  t.isDone === true ||
+  !!t.completedAt
+);
+  const added = monthTasks.length;
+  const done = doneTasks.length;
+  const rate = added > 0 ? Math.round((done / added) * 100) : 0;
+
+  document.getElementById('month-stats').innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <div style="font-size:13px; color:var(--color-ink-soft);">Tasks added</div>
+        <div style="font-family:var(--font-display); font-size:26px; color:var(--color-primary-darker);">${added}</div>
       </div>
-    `).join('');
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <div style="font-size:13px; color:var(--color-ink-soft);">Tasks completed</div>
+        <div style="font-family:var(--font-display); font-size:26px; color:var(--color-good);">${done}</div>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;">
+          <div style="font-size:13px; color:var(--color-ink-soft);">Completion rate</div>
+          <div style="font-family:var(--font-display); font-size:20px; color:var(--color-primary-darker);">${rate}%</div>
+        </div>
+        <div class="bar-track" style="height:10px;">
+          <div class="bar-fill" style="width:${rate}%"></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+    function renderCalendar(){
+      const year = calDate.getFullYear();
+      const month = calDate.getMonth();
+
+      document.getElementById('calendar-title').textContent = `${monthNames[month]} ${year}`;
+      document.getElementById('month-stats-title').textContent = `${monthNames[month]} ${year} — Summary`;
+      renderMonthStats(year, month);
+      const firstDay = new Date(year, month, 1);
+      const startOffset = firstDay.getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      const today = new Date();
+      today.setHours(0,0,0,0);
+
+      let cells = '';
+
+      for(let i = 0; i < startOffset; i++){
+        cells += `<div></div>`;
+      }
+
+      for(let day = 1; day <= daysInMonth; day++){
+        const cellDate = new Date(year, month, day);
+        cellDate.setHours(0,0,0,0);
+        const dayTasks = tasksOnDay(cellDate);
+        const isToday = cellDate.getTime() === today.getTime();
+
+        cells += `
+<div style="height:50px; border-radius:8px; background:var(--color-line); padding:6px; display:flex; flex-direction:column; justify-content:space-between; ${isToday ? 'outline:2px solid var(--color-primary);' : ''}">
+  <div style="font-size:12px; color:var(--color-ink-soft);">${day}</div>${dayTasks.length > 0 ? (() => {
+  const priorityColorMap = { high: '#4caf50', med: '#ffd60a', low: '#ff4d4d' };
+  const priorityRank = { high: 3, med: 2, low: 1 };
+  const topTask = [...dayTasks].sort((a, b) => (priorityRank[b.priority] || 0) - (priorityRank[a.priority] || 0))[0];
+  const color = priorityColorMap[topTask.priority] || '#ff6a00';
+return `<div style="align-self:flex-end; margin-top:-6px; background:${color}; color:#111; font-size:11px; font-weight:750; border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center;">${dayTasks.length}</div>`;})() : ''}          </div>
+        `;
+      }
+
+      const gridEl = document.getElementById('calendar-grid');
+      gridEl.style.cssText = 'display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-top:6px;';
+      gridEl.innerHTML = cells;
+    }
+
+    document.getElementById('cal-prev').addEventListener('click', () => {
+      calDate.setMonth(calDate.getMonth() - 1);
+      renderCalendar();
+    });
+    document.getElementById('cal-next').addEventListener('click', () => {
+      calDate.setMonth(calDate.getMonth() + 1);
+      renderCalendar();
+    });
+    document.getElementById('cal-today').addEventListener('click', () => {
+      calDate = new Date();
+      calDate.setDate(1);
+      renderCalendar();
+    });
+
+    renderCalendar();
 
     updateNavCounts(user.email);
   }
