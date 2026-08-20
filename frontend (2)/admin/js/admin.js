@@ -113,3 +113,107 @@ document.querySelector('[data-form="admin"]').addEventListener('submit', event =
 });
 
 setAdminSection(window.location.hash.slice(1) || 'dashboard');
+// ===== PM Work Hours Calendar (placeholder data) =====
+const pmNames = ['Sara Ahmed', 'Omar Khaled', 'Mona Adel'];
+let pmCalDate = new Date();
+pmCalDate.setDate(1);
+
+const pmMonthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const pmWeekdayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+const pmWeekdaysEl = document.getElementById('pm-cal-weekdays');
+if(pmWeekdaysEl){
+  pmWeekdaysEl.innerHTML = pmWeekdayNames.map(w => `<div>${w}</div>`).join('');
+
+  function pmHoursForDay(date){
+    const day = date.getDate();
+    const isWeekend = date.getDay() === 5 || date.getDay() === 6; // Fri & Sat
+    return pmNames.map((name, i) => {
+      if(isWeekend) return { name, hours: 0 };
+      const seed = (day * (i + 3) * 7) % 9;
+      const hours = 2 + (seed % 7);
+      return { name, hours };
+    });
+  }
+
+  function showPmDay(dateObj){
+    const panel = document.getElementById('pm-day-panel');
+    const label = dateObj.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const rows = pmHoursForDay(dateObj);
+    const total = rows.reduce((sum, r) => sum + r.hours, 0);
+
+    panel.innerHTML = `
+      <div style="font-weight:700; margin-bottom:10px;">${label} — ${total}h total</div>
+      ${rows.map(r => `
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--color-line);">
+          <div style="font-size:14px;">${r.name}</div>
+          <div style="font-size:13px; color:var(--color-primary-darker); font-weight:600;">${r.hours}h</div>
+        </div>
+      `).join('')}
+    `;
+    panel.style.display = 'block';
+  }
+
+  function renderPmCalendar(){
+    const year = pmCalDate.getFullYear();
+    const month = pmCalDate.getMonth();
+
+    document.getElementById('pm-cal-title').textContent = `${pmMonthNames[month]} ${year} — PM Hours`;
+
+    const firstDay = new Date(year, month, 1);
+    const startOffset = firstDay.getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    let cells = '';
+    for(let i = 0; i < startOffset; i++){
+      cells += `<div></div>`;
+    }
+
+    for(let day = 1; day <= daysInMonth; day++){
+      const cellDate = new Date(year, month, day);
+      cellDate.setHours(0,0,0,0);
+      const isToday = cellDate.getTime() === today.getTime();
+      const rows = pmHoursForDay(cellDate);
+      const total = rows.reduce((sum, r) => sum + r.hours, 0);
+
+      cells += `
+        <div class="pm-day-cell" data-date="${cellDate.getTime()}" style="min-height:60px; border-radius:8px; background:var(--color-line); padding:6px; display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; ${isToday ? 'outline:2px solid var(--color-primary);' : ''}">
+          <div style="font-size:12px; color:var(--color-ink-soft);">${day}</div>
+          <div style="align-self:flex-end; font-size:11px; font-weight:700; color:${total > 0 ? 'var(--color-primary-darker)' : 'var(--color-ink-soft)'};">${total > 0 ? total + 'h' : '—'}</div>
+        </div>
+      `;
+    }
+
+    const gridEl = document.getElementById('pm-cal-grid');
+    gridEl.innerHTML = cells;
+
+    gridEl.querySelectorAll('.pm-day-cell').forEach(cell => {
+      cell.addEventListener('click', () => {
+        showPmDay(new Date(Number(cell.dataset.date)));
+      });
+    });
+  }
+
+  document.getElementById('pm-cal-prev').addEventListener('click', () => {
+    pmCalDate.setMonth(pmCalDate.getMonth() - 1);
+    renderPmCalendar();
+  });
+  document.getElementById('pm-cal-next').addEventListener('click', () => {
+    pmCalDate.setMonth(pmCalDate.getMonth() + 1);
+    renderPmCalendar();
+  });
+  document.getElementById('pm-cal-today').addEventListener('click', () => {
+    pmCalDate = new Date();
+    pmCalDate.setDate(1);
+    renderPmCalendar();
+  });
+
+  renderPmCalendar();
+
+
+
+  
+}

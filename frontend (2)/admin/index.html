@@ -55,10 +55,26 @@
             <div class="stat-tile admin-empty-stat"><div class="label">Records</div><div class="value">--</div><div class="delta">No data available</div></div>
             <div class="stat-tile admin-empty-stat"><div class="label">Activity</div><div class="value">--</div><div class="delta">No data available</div></div>
           </div>
-          <div class="admin-grid-two">
+                    <div class="admin-grid-two">
             <div class="card card-pad admin-empty-card"><div class="card-head"><h2>Overview</h2></div><div class="empty-state"><span class="empty-icon">+</span><strong>No overview data</strong><span>Admin metrics will appear here when connected.</span></div></div>
             <div class="card card-pad admin-empty-card"><div class="card-head"><h2>Recent activity</h2></div><div class="empty-state"><span class="empty-icon">+</span><strong>No activity yet</strong><span>There is nothing to review.</span></div></div>
           </div>
+
+          <div class="card card-pad grid-gap" id="pm-hours-card">
+            <div class="card-head">
+              <h2 id="pm-cal-title">PM Work Hours</h2>
+              <div class="calendar-nav">
+                <button class="cal-btn" id="pm-cal-prev">‹</button>
+                <button class="cal-btn" id="pm-cal-today">Today</button>
+                <button class="cal-btn" id="pm-cal-next">›</button>
+              </div>
+            </div>
+            <div class="calendar-weekdays" id="pm-cal-weekdays"></div>
+            <div class="calendar-grid" id="pm-cal-grid"></div>
+            <div id="pm-day-panel" style="display:none; margin-top:16px; padding:14px; background:var(--color-bg); border-radius:8px; border:1px solid var(--color-line);"></div>
+            <div style="margin-top:10px; font-size:11px; color:var(--color-ink-soft);">* بيانات تجريبية — لسه مش متصلة بنظام تسجيل ساعات حقيقي.</div>
+          </div>
+        </section>
         </section>
 
         <section class="admin-section" data-panel="project-managers"><div class="card card-pad"><div class="card-head"><h2>View Project Managers</h2></div><div class="empty-state empty-state-large"><span class="empty-icon">+</span><strong>No project managers yet</strong><span>Project managers will appear here when connected.</span></div></div></section>
