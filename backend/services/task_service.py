@@ -1,4 +1,4 @@
-from models.task import ParsedTaskRow, TaskStatus,Task
+from models.task import ParsedTaskRow, TaskStatus
 from repositories import pm_repository, task_repository
 
 
@@ -99,9 +99,9 @@ def reassign_task(task_id: int, new_pm_id: int, current_pm) -> dict:
     return updated
 
 
-def get_tasks_for_pm(pm_id: int) -> list[Task]:
+def get_tasks_for_pm(pm_id: int) -> list[dict]:
     """Get all tasks belonging to a specific PM."""
-    return [Task(**row) for row in task_repository.query_by_pm(pm_id)]
+    return task_repository.query_by_pm(pm_id)
 
 
 def list_projects(assigned_pm_id: int | None = None) -> list[dict]:
