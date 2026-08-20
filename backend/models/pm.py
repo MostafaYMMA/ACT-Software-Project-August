@@ -21,8 +21,9 @@ class PMCreate(BaseModel):
     email: str
     auth_id: str
     name: Optional[str] = None
-    is_admin: bool = False
     username: str
+    is_admin: bool = False
+
     
 
 class PMAdminUpdate(BaseModel):
