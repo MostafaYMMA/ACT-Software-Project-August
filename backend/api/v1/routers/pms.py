@@ -2,8 +2,8 @@
 
 from fastapi import APIRouter, Depends
 
-from api.v1.dependencies import get_current_pm
-from models.pm import PM
+from api.v1.dependencies import get_current_pm, require_admin
+from models.pm import PM, PMCreate
 from services import pm_service
 
 router = APIRouter(prefix="/pms", tags=["pms"])
@@ -19,3 +19,24 @@ def list_pms(current_pm: PM = Depends(get_current_pm)):
 def get_pm(pm_id: int, current_pm: PM = Depends(get_current_pm)):
     """GET /pms/{pm_id} — return one PM by id."""
     return pm_service.get_pm(pm_id)
+
+
+
+@router.post("/", response_model=PM, status_code=201)
+def add_pm(new_pm: PMCreate, current_pm: PM = Depends(require_admin)):
+    """POST /pms — admin-only. Creates a new PM record.
+
+    Note: this only inserts the pms row. The Supabase Auth user (auth_id)
+    must already exist — that's provisioned separately by the seed script.
+    """
+    return pm_service.create_pm(new_pm, current_pm)
+
+@router.post("/heartbeat")
+def heartbeat(current_pm: PM = Depends(get_current_pm)):
+    pm_service.record_heartbeat(current_pm.id)
+    return {"status": "ok"}
+
+
+@router.get("/{pm_id}/online")
+def check_online(pm_id: int) -> bool:
+    return pm_service.is_online(pm_id)

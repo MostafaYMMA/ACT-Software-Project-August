@@ -79,6 +79,23 @@ def claim_task(task_id: int, pm_id: int) -> dict | None:
     )
     return resp.data[0] if resp.data else None
 
+def reassign_task(task_id: int, new_pm_id: int) -> dict | None:
+    """Move a task to a different PM, regardless of its current status/owner.
+
+    Unlike claim_task, this is not conditional on the task being unassigned -
+    it's an admin override, so it always sets status back to 'assigned' under
+    the new owner.
+    """
+    resp = (
+        get_supabase()
+        .table(TABLE)
+        .update({"status": "assigned", "assigned_pm_id": new_pm_id})
+        .eq("id", task_id)
+        .execute()
+    )
+    return resp.data[0] if resp.data else None
+
+
 def query_by_pm(pm_id: int) -> list[dict]:
     """Fetch all tasks assigned to a specific PM."""
     supabase = get_supabase()
@@ -91,51 +108,11 @@ def query_by_pm(pm_id: int) -> list[dict]:
     return response.data
 
 
-def search_tasks(
-    search_query: str | None = None,
-    from_date: str | None = None,
-    to_date: str | None = None,
-    status: str | None = None,
-) -> list[dict]:
-    """
-    Search and filter tasks by text query and date range.
-    
-    Args:
-        search_query: Text to search in title, description, source_reference
-        from_date: ISO format date string (YYYY-MM-DD) for start of range
-        to_date: ISO format date string (YYYY-MM-DD) for end of range
-        status: Filter by status ('assigned' or 'unassigned')
-    
-    Returns:
-        List of matching tasks.
-    """
+def get_projects_rows(assigned_pm_id: int | None = None) -> list[dict]:
+    """Fetch project_name, project_number, task_number, and pm, optionally filtered by assigned_pm_id."""
     supabase = get_supabase()
-    query = supabase.table(TABLE).select("*")
-    
-    # Apply status filter if provided
-    if status:
-        query = query.eq("status", status)
-    
-    # Apply date filters if provided
-    if from_date:
-        query = query.gte("created_at", f"{from_date}T00:00:00Z")
-    if to_date:
-        query = query.lte("created_at", f"{to_date}T23:59:59Z")
-    
-    resp = query.execute()
-    tasks = resp.data if resp.data else []
-    
-    # Apply text search filter if provided (client-side since Supabase
-    # basic API doesn't have full-text search built in for all fields)
-    if search_query:
-        search_lower = search_query.lower()
-        tasks = [
-            t for t in tasks
-            if (
-                search_lower in (t.get("title") or "").lower()
-                or search_lower in (t.get("description") or "").lower()
-                or search_lower in (t.get("source_reference") or "").lower()
-            )
-        ]
-    
-    return tasks
+    query = supabase.table("tasks").select("project_name, project_number, task_number, pm")
+    if assigned_pm_id is not None:
+        query = query.eq("assigned_pm_id", assigned_pm_id)
+    response = query.execute()
+    return response.data    
