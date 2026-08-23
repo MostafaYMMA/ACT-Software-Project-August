@@ -111,3 +111,24 @@ def list_projects(assigned_pm_id: int | None = None) -> list[dict]:
     If omitted, every task (admin view).
     """
     return task_repository.get_projects_rows(assigned_pm_id)
+
+
+def list_distinct_projects(assigned_pm_id: int | None = None) -> list[dict]:
+    """
+    Distinct list of projects (project_number, project_name, pm), no duplicates
+    from repeated tasks under the same project.
+    If assigned_pm_id is given, only that PM's projects. If omitted, every project.
+    """
+    rows = task_repository.get_projects_rows(assigned_pm_id)
+
+    seen = {}
+    for row in rows:
+        number = row.get("project_number")
+        if number and number not in seen:
+            seen[number] = {
+                "project_number": number,
+                "project_name": row.get("project_name"),
+                "pm": row.get("pm"),
+            }
+
+    return sorted(seen.values(), key=lambda p: p["project_number"])

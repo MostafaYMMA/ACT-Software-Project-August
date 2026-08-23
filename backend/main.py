@@ -2,7 +2,7 @@ from fastapi import Depends, FastAPI, Form, HTTPException
 from supabase import create_client
 
 from api.v1.dependencies import get_current_pm
-from api.v1.routers import pms, sync, tasks
+from api.v1.routers import pms, sync, tasks ,schedule
 from core.config import settings
 from models.pm import PM
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,6 +23,7 @@ app.add_middleware(
 app.include_router(tasks.router, prefix="/api/v1")
 app.include_router(pms.router, prefix="/api/v1")
 app.include_router(sync.router, prefix="/api/v1")
+app.include_router(schedule.router, prefix="/api/v1")
 
 
 @app.get("/")
