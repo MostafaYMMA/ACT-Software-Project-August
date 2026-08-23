@@ -4,7 +4,7 @@ Repositories are pure data access — no business decisions (that's services/).
 """
 from repositories.supabase_client import get_supabase
 
-TABLE = "supplier_schedule"  # confirm real table name
+TABLE = "tasks"  # confirm real table name
 
 
 def get_hours_rows(**filters) -> list[dict]:
