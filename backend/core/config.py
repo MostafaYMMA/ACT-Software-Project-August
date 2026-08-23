@@ -27,12 +27,6 @@ class Settings(BaseSettings):
     dev_test_user_email: str | None = None
     dev_test_user_password: str | None = None
 
-    # --- Microsoft Graph (app-only auth against the shared mailbox) ---
-    ms_tenant_id: str | None = None
-    ms_client_id: str | None = None
-    ms_client_secret: str | None = None
-    ms_mailbox_user: str | None = None  # UPN/address of the shared mailbox
-
 
 @lru_cache
 def get_settings() -> Settings:
