@@ -113,6 +113,7 @@ document.querySelector('[data-form="admin"]').addEventListener('submit', event =
 });
 
 setAdminSection(window.location.hash.slice(1) || 'dashboard');
+
 // ===== PM Work Hours Calendar (placeholder data) =====
 const pmNames = ['Sara Ahmed', 'Omar Khaled', 'Mona Adel'];
 let pmCalDate = new Date();
@@ -212,8 +213,40 @@ if(pmWeekdaysEl){
   });
 
   renderPmCalendar();
+}
 
+// ===== Notifications dropdown =====
+document.addEventListener('DOMContentLoaded', () => {
+  const notifBtn = document.getElementById('notifBtn');
+  const notifBox = document.getElementById('notifBox');
+  if (!notifBtn || !notifBox) return;
 
+  notifBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notifBox.classList.toggle('show');
+  });
 
-  
+  document.addEventListener('click', (e) => {
+    if (!notifBox.contains(e.target) && !notifBtn.contains(e.target)) {
+      notifBox.classList.remove('show');
+    }
+  });
+});
+
+function addNotification(text){
+  const list = document.getElementById('notifList');
+  if (!list) return;
+  const empty = list.querySelector('.notification-empty');
+  if (empty) empty.remove();
+
+  const item = document.createElement('div');
+  item.className = 'notification-item';
+  item.textContent = text;
+  list.prepend(item);
+
+  const countEl = document.getElementById('notifCount');
+  const current = parseInt(countEl.textContent || '0', 10) + 1;
+  countEl.textContent = current;
+  countEl.classList.add('show');
+
 }

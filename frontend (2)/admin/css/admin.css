@@ -53,4 +53,5 @@
 
 @media (max-width: 1050px){ .admin-stat-grid{ grid-template-columns: repeat(2, minmax(150px, 1fr)); } }
 @media (max-width: 780px){ .admin-grid-two, .admin-settings-grid{ grid-template-columns: 1fr; } }
-@media (max-width: 520px){ .admin-stat-grid{ grid-template-columns: 1fr 1fr; gap: 10px; } .admin-stat-grid .stat-tile{ padding: 14px; } .admin-badge{ display: none; } }
+@media (max-width: 520px){ .admin-stat-grid{ grid-template-columns: 1fr 1fr; gap: 10px; } .admin-stat-grid .stat-tile{ padding: 14px; } .admin-badge{ display: none; } 
+}
