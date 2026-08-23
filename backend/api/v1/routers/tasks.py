@@ -74,3 +74,12 @@ def get_pm_tasks(pm_id: int, current_pm: PM = Depends(get_current_pm)) -> list[d
     """GET /pms/{pm_id}/tasks — return all tasks assigned to this PM."""
     pm_service.get_pm(pm_id)  # confirms PM exists, raises 404 if not
     return task_service.get_tasks_for_pm(pm_id)
+
+
+@router.get("/projects/distinct")
+def get_distinct_projects(assigned_pm_id: int | None = None) -> list[dict]:
+    """
+    GET /tasks/projects/distinct                    — all distinct projects (admin view)
+    GET /tasks/projects/distinct?assigned_pm_id=5    — only this PM's distinct projects
+    """
+    return task_service.list_distinct_projects(assigned_pm_id)
