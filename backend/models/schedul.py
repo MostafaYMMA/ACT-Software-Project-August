@@ -27,7 +27,7 @@ class SupplierSchedule(BaseModel):
     resource_manager: Optional[str] = None
     project_status: Optional[str] = None
     project_country: Optional[str] = None
-    remote_or_onsite: Optional[str] = None
+    remote_onsite: Optional[str] = None
     brand: Optional[str] = None
     po: Optional[str] = None
     sow: Optional[str] = None
