@@ -2,25 +2,27 @@ from datetime import datetime
 
 from repositories.supabase_client import get_supabase
 
-TABLE = "sync_state"
-SINGLETON_KEY = "mailbox_sync"
+TABLE = "tasks"
 
 
 def get_last_synced_at() -> datetime | None:
+    """Derived from the data itself instead of a dedicated sync_state row -
+    the most recent created_at in `tasks` stands in for "last synced at".
+    Approximate: anything else that writes to `tasks` also shifts this.
+    """
     resp = (
         get_supabase()
         .table(TABLE)
-        .select("last_synced_at")
-        .eq("key", SINGLETON_KEY)
-        .maybe_single()
+        .select("created_at")
+        .order("created_at", desc=True)
+        .limit(1)
         .execute()
     )
-    if not resp or not resp.data:
+    if not resp.data:
         return None
-    return datetime.fromisoformat(resp.data["last_synced_at"])
+    return datetime.fromisoformat(resp.data[0]["created_at"])
 
 
 def set_last_synced_at(when: datetime) -> None:
-    get_supabase().table(TABLE).upsert(
-        {"key": SINGLETON_KEY, "last_synced_at": when.isoformat()}
-    ).execute()
+    """No-op - the timestamp is implicit in tasks.created_at, there's
+    nothing separate to write."""

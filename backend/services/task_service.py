@@ -37,6 +37,33 @@ def upsert_task_from_row(row: ParsedTaskRow, source_email_id: str) -> dict:
     return task_repository.create_task(task_payload)
 
 
+def upsert_supplier_schedule_row(row: dict, source_email_id: str) -> dict:
+    """Apply one parsed Excel row (see services/parser.parse_excel_to_task_rows)
+    to the `tasks` table.
+
+    The table's primary key is (project_name, project_number, task_number) -
+    a row with the same key fully overwrites the existing record (not a
+    merge), including re-resolving assigned_pm_id/status from the new `pm`
+    value, since a changed PM is the most common kind of update expected.
+    """
+    assigned_pm_id = None
+    status = TaskStatus.UNASSIGNED
+    pm_email = row.get("pm")
+    if pm_email:
+        pm = pm_repository.get_by_email(pm_email)
+        if pm:
+            assigned_pm_id = pm["id"]
+            status = TaskStatus.ASSIGNED
+
+    payload = {
+        **row,
+        "assigned_pm_id": assigned_pm_id,
+        "status": status.value,
+        "source_email_id": source_email_id,
+    }
+    return task_repository.upsert_task(payload)
+
+
 def list_tasks() -> list[dict]:
     return task_repository.list_tasks()
 

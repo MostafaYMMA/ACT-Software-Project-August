@@ -38,6 +38,25 @@ def create_task(task: dict) -> dict:
     return resp.data[0]
 
 
+# Composite primary key as of the schema migration in this conversation -
+# (project_name, project_number, task_number) instead of `id`.
+SUPPLIER_SCHEDULE_KEY = "project_name,project_number,task_number"
+
+
+def upsert_task(task: dict) -> dict:
+    """Insert a supplier-schedule row, or fully overwrite the existing row
+    with the same (project_name, project_number, task_number) - not a
+    merge, per CLAUDE.md rule 3.
+    """
+    resp = (
+        get_supabase()
+        .table(TABLE)
+        .upsert(task, on_conflict=SUPPLIER_SCHEDULE_KEY)
+        .execute()
+    )
+    return resp.data[0]
+
+
 def overwrite_task(task_id: int, task: dict) -> dict:
     """Fully replace an existing task record (not a merge), per CLAUDE.md rule 3."""
     resp = get_supabase().table(TABLE).update(task).eq("id", task_id).execute()
