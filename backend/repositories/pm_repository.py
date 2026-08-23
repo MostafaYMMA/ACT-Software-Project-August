@@ -90,4 +90,14 @@ def update(pm_id: int, fields: dict) -> dict | None:
         .execute()
     )
     return response.data[0] if response.data else None
-
+ 
+def list_pending() -> list[dict]:
+    """Fetch every PM row where is_approved is false."""
+    supabase = get_supabase()
+    response = (
+        supabase.table(TABLE)
+        .select("*")
+        .eq("is_approved", False)
+        .execute()
+    )
+    return response.data or []
