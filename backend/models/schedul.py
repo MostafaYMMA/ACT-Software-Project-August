@@ -1,7 +1,18 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+from enum import Enum
 
+
+
+class ProjectStatus(str, Enum):
+    ACTIVE = "Active"
+    POST_WAR = "Post-WAR"
+    PENDING = "Pending"
+    NOT_ACTIVE = "Not-Active"
+
+class ProjectStatusUpdate(BaseModel):
+    project_status: ProjectStatus
 class SupplierSchedule(BaseModel):
     id: int
     supplier_name: Optional[str] = None

@@ -2,7 +2,7 @@ from fastapi import Depends, FastAPI, Form, HTTPException
 from supabase import create_client
 
 from api.v1.dependencies import get_current_pm
-from api.v1.routers import pms, sync, tasks ,schedule
+from api.v1.routers import pms, sync, tasks, schedule
 from core.config import settings
 from models.pm import PM
 from fastapi.middleware.cors import CORSMiddleware
