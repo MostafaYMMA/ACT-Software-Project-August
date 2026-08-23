@@ -1,17 +1,15 @@
 # backend/services/schedule_service.py
 from repositories import schedule_repository
 
-ALLOWED_ATTRIBUTES = {"brand", "rate_type", "project_country", "remote_or_onsite"}
 
 
 
-# backend/services/schedule_service.py
 
 ALLOWED_ATTRIBUTES = {
     "brand",
     "rate_type",
     "project_country",
-    "remote_or_onsite",
+    "remote_onsite",
     "project_number",
     "project_name",
     "pm",
