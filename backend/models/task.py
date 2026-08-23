@@ -15,6 +15,7 @@ class ParsedTaskRow(BaseModel):
     title: str
     description: str | None = None
     assigned_pm_email: str | None = None
+    due_date: datetime | None = None
     # TODO(open decision): whichever field the team picks as the dedupe key
     # for overwrite matching should be added here once confirmed.
     source_reference: str | None = None
@@ -27,6 +28,7 @@ class TaskCreate(BaseModel):
     assigned_pm_id: int | None = None
     source_email_id: str
     source_reference: str | None = None
+    due_date: datetime | None = None
 
 
 class TaskUpdate(BaseModel):
@@ -34,6 +36,7 @@ class TaskUpdate(BaseModel):
     description: str | None = None
     status: TaskStatus | None = None
     assigned_pm_id: int | None = None
+    due_date: datetime | None = None
 
 
 class TaskReassign(BaseModel):
@@ -51,5 +54,6 @@ class Task(BaseModel):
     assigned_pm_id: int | None = None
     source_email_id: str
     source_reference: str | None = None
+    due_date: datetime | None = None
     created_at: datetime
     updated_at: datetime

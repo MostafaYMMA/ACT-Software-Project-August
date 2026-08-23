@@ -1,5 +1,59 @@
+from datetime import datetime, timezone
+
 from models.task import ParsedTaskRow, TaskStatus
 from repositories import pm_repository, task_repository
+
+# Days-until-deadline thresholds for the derived "priority" label - tuned
+# for a PM checking their list once a day, not a real-time queue.
+_URGENT_WITHIN_DAYS = 1
+_HIGH_WITHIN_DAYS = 3
+_MEDIUM_WITHIN_DAYS = 7
+
+
+def _deadline_timestamp(task: dict) -> float | None:
+    """Effective end date used for prioritization.
+
+    Email-sourced tasks carry `due_date`; supplier-schedule (Excel) rows
+    instead carry `resource_end` (see services/parser.py). Whichever is
+    present is the task's deadline for this purpose.
+    """
+    raw = task.get("due_date") or task.get("resource_end")
+    if not raw:
+        return None
+    dt = raw if isinstance(raw, datetime) else datetime.fromisoformat(raw)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.timestamp()
+
+
+def _priority_label(deadline_ts: float | None) -> str:
+    """Derived priority: how soon a task's deadline is, not a stored field.
+
+    No deadline -> lowest priority, since there's nothing to be urgent about.
+    """
+    if deadline_ts is None:
+        return "low"
+    days_until = (deadline_ts - datetime.now(timezone.utc).timestamp()) / 86400
+    if days_until <= _URGENT_WITHIN_DAYS:
+        return "urgent"
+    if days_until <= _HIGH_WITHIN_DAYS:
+        return "high"
+    if days_until <= _MEDIUM_WITHIN_DAYS:
+        return "medium"
+    return "low"
+
+
+def _sorted_by_priority(tasks: list[dict]) -> list[dict]:
+    """Order tasks so the ones ending soonest surface first, tagging each
+    with a derived `priority` label. Tasks with no known deadline sort last.
+    """
+    decorated = []
+    for task in tasks:
+        deadline_ts = _deadline_timestamp(task)
+        decorated.append((deadline_ts, {**task, "priority": _priority_label(deadline_ts)}))
+
+    decorated.sort(key=lambda pair: (pair[0] is None, pair[0]))
+    return [task for _, task in decorated]
 
 
 def upsert_task_from_row(row: ParsedTaskRow, source_email_id: str) -> dict:
@@ -25,6 +79,7 @@ def upsert_task_from_row(row: ParsedTaskRow, source_email_id: str) -> dict:
         "assigned_pm_id": assigned_pm_id,
         "source_email_id": source_email_id,
         "source_reference": row.source_reference,
+        "due_date": row.due_date.isoformat() if row.due_date else None,
     }
 
     existing = (
@@ -65,11 +120,15 @@ def upsert_supplier_schedule_row(row: dict, source_email_id: str) -> dict:
 
 
 def list_tasks() -> list[dict]:
-    return task_repository.list_tasks()
+    """All tasks, highest priority (soonest deadline) first."""
+    return _sorted_by_priority(task_repository.list_tasks())
 
 
 def get_task(task_id: int) -> dict | None:
-    return task_repository.get_task_by_id(task_id)
+    task = task_repository.get_task_by_id(task_id)
+    if task is None:
+        return None
+    return {**task, "priority": _priority_label(_deadline_timestamp(task))}
 
 
 def claim_task(task_id: int, pm_id: int) -> dict:
@@ -127,8 +186,9 @@ def reassign_task(task_id: int, new_pm_id: int, current_pm) -> dict:
 
 
 def get_tasks_for_pm(pm_id: int) -> list[dict]:
-    """Get all tasks belonging to a specific PM."""
-    return task_repository.query_by_pm(pm_id)
+    """All tasks belonging to a specific PM, highest priority (soonest
+    deadline) first."""
+    return _sorted_by_priority(task_repository.query_by_pm(pm_id))
 
 
 def list_projects(assigned_pm_id: int | None = None) -> list[dict]:
