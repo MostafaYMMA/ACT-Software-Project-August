@@ -9,5 +9,6 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/login", response_model=TokenResponse)
 def login(payload: LoginRequest):
-    """POST /auth/login — email/password login. Returns a JWT access token
+    """POST /auth/login. Returns a JWT access token to send as
+    Authorization: Bearer <token> on every other endpoint."""
     return auth_service.login(payload.email, payload.password)

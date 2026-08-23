@@ -15,6 +15,13 @@ def list_pms(current_pm: PM = Depends(get_current_pm)):
     return pm_service.list_pms()
 
 
+@router.get("/pending", response_model=list[PM])
+def get_pending_pms(current_pm: PM = Depends(require_admin)):
+    """GET /pms/pending — admin-only. List every PM still waiting for
+    approval (id, name, email, etc.)."""
+    return pm_service.list_pending_pms()
+
+
 @router.get("/{pm_id}", response_model=PM)
 def get_pm(pm_id: int, current_pm: PM = Depends(get_current_pm)):
     """GET /pms/{pm_id} — return one PM by id."""
@@ -52,6 +59,7 @@ def heartbeat(current_pm: PM = Depends(get_current_pm)):
 @router.get("/{pm_id}/online")
 def check_online(pm_id: int) -> bool:
     return pm_service.is_online(pm_id)
+
 
 @router.patch("/{pm_id}/approve", response_model=PM)
 def approve_pm(pm_id: int, current_pm: PM = Depends(require_admin)):

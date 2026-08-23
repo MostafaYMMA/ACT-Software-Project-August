@@ -103,3 +103,6 @@ def is_online(pm_id: int) -> bool:
         return False
     last_seen = datetime.fromisoformat(pm["last_seen"])
     return datetime.now(timezone.utc) - last_seen < timedelta(seconds=60)
+def list_pending_pms() -> list[PM]:
+    """Admin-only: list every PM still waiting for approval."""
+    return [PM(**row) for row in pm_repository.list_pending()]
