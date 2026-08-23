@@ -117,3 +117,28 @@ def get_projects_rows(assigned_pm_id: int | None = None) -> list[dict]:
         query = query.eq("assigned_pm_id", assigned_pm_id)
     response = query.execute()
     return response.data    
+
+
+from datetime import date
+
+def query_by_date_range(
+    start_date: date,
+    end_date: date | None = None,
+    assigned_pm_id: int | None = None,
+) -> list[dict]:
+    """
+    Fetch tasks where [DATE COLUMN — TBD] is on/after start_date, optionally
+    on/before end_date, optionally scoped to one PM via assigned_pm_id.
+    """
+    supabase = get_supabase()
+    query = (
+        supabase.table("tasks")
+        .select("*")
+        .gte("resource_start", start_date.isoformat())  # ⚠️ column not confirmed on current Task model
+    )
+    if end_date is not None:
+        query = query.lte("resource_start", end_date.isoformat())  # ⚠️ same column
+    if assigned_pm_id is not None:
+        query = query.eq("assigned_pm_id", assigned_pm_id)
+    response = query.execute()
+    return response.data

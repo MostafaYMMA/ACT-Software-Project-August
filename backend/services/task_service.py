@@ -1,5 +1,6 @@
-from models.task import ParsedTaskRow, TaskStatus
+from models.task import ParsedTaskRow, TaskStatus ,Task
 from repositories import pm_repository, task_repository
+from datetime import datetime,date
 
 
 def upsert_task_from_row(row: ParsedTaskRow, source_email_id: str) -> dict:
@@ -132,3 +133,20 @@ def list_distinct_projects(assigned_pm_id: int | None = None) -> list[dict]:
             }
 
     return sorted(seen.values(), key=lambda p: p["project_number"])
+
+
+from datetime import date
+from models.task import Task
+
+def get_tasks_in_range(
+    start_date: date,
+    end_date: date | None = None,
+    assigned_pm_id: int | None = None,
+) -> list[Task]:
+    """
+    Tasks within a date range.
+    - end_date omitted -> everything from start_date onward
+    - assigned_pm_id given -> only that PM's tasks; omitted -> all tasks (admin view)
+    """
+    rows = task_repository.query_by_date_range(start_date, end_date, assigned_pm_id)
+    return [Task(**row) for row in rows]
