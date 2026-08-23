@@ -52,3 +52,8 @@ def heartbeat(current_pm: PM = Depends(get_current_pm)):
 @router.get("/{pm_id}/online")
 def check_online(pm_id: int) -> bool:
     return pm_service.is_online(pm_id)
+
+@router.patch("/{pm_id}/approve", response_model=PM)
+def approve_pm(pm_id: int, current_pm: PM = Depends(require_admin)):
+    """PATCH /pms/{pm_id}/approve — admin-only. Approve a pending signup."""
+    return pm_service.approve_pm(pm_id, current_pm)

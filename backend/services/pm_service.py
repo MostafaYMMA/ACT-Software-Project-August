@@ -78,6 +78,20 @@ def set_admin_status(pm_id: int, is_admin: bool, requesting_pm: PM) -> PM:
 
     return PM(**updated)
 
+def approve_pm(pm_id: int, requesting_pm: PM) -> PM:
+    """Admin-only: approve a pending signup so the PM can log in."""
+    if not requesting_pm.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+
+    target = pm_repository.get_by_id(pm_id)
+    if target is None:
+        raise HTTPException(status_code=404, detail="PM not found")
+
+    updated = pm_repository.update(pm_id, {"is_approved": True})
+    if updated is None:
+        raise HTTPException(status_code=404, detail="PM not found")
+
+    return PM(**updated)
 
 def record_heartbeat(pm_id: int) -> None:
     pm_repository.update_last_seen(pm_id)
@@ -89,5 +103,3 @@ def is_online(pm_id: int) -> bool:
         return False
     last_seen = datetime.fromisoformat(pm["last_seen"])
     return datetime.now(timezone.utc) - last_seen < timedelta(seconds=60)
-
-
