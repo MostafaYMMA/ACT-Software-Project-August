@@ -17,3 +17,20 @@ def get_hours_rows(**filters) -> list[dict]:
     response = query.execute()
     return response.data
 
+def get_rows_by_project_number(project_number: str) -> list[dict]:
+    supabase = get_supabase()
+    response = (
+        supabase.table(TABLE).select("*").eq("project_number", project_number).execute()
+    )
+    return response.data or []
+
+
+def update_project_status(project_number: str, new_status: str, pm_name: str | None = None) -> list[dict]:
+    supabase = get_supabase()
+    query = supabase.table(TABLE).update({"project_status": new_status}).eq(
+        "project_number", project_number
+    )
+    if pm_name is not None:
+        query = query.eq("pm", pm_name)
+    response = query.execute()
+    return response.data or []
