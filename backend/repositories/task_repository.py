@@ -39,14 +39,18 @@ def create_task(task: dict) -> dict:
 
 
 # Composite primary key as of the schema migration in this conversation -
-# (project_name, project_number, task_number) instead of `id`.
-SUPPLIER_SCHEDULE_KEY = "project_name,project_number,task_number"
+# (project_name, project_number, task_number, resource) instead of `id`.
+# `resource` had to be added after project_name/project_number/task_number
+# alone turned out not to be unique in real data - multiple people are
+# routinely booked against the same project+task, and the 3-column key was
+# silently collapsing them into one row (81 real rows -> 28 survived).
+SUPPLIER_SCHEDULE_KEY = "project_name,project_number,task_number,resource"
 
 
 def upsert_task(task: dict) -> dict:
     """Insert a supplier-schedule row, or fully overwrite the existing row
-    with the same (project_name, project_number, task_number) - not a
-    merge, per CLAUDE.md rule 3.
+    with the same (project_name, project_number, task_number, resource) -
+    not a merge, per CLAUDE.md rule 3.
     """
     resp = (
         get_supabase()

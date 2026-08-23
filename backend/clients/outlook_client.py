@@ -54,22 +54,23 @@ def _get_inbox():
 def fetch_new_messages(since: datetime | None = None) -> list[dict]:
     inbox = _get_inbox()
 
-    # Filter via Outlook's own Restrict() *before* iterating in Python -
-    # this inbox has 28k+ items and almost all of them are unread, so
-    # reading properties off each one individually (item.UnRead,
-    # item.ReceivedTime, ...) one Python-side COM round-trip at a time made
-    # a sync take several minutes or longer. Restrict() evaluates both
-    # conditions COM-side, so Python only ever touches the actual matches.
-    filter_parts = ["[Unread] = True"]
-    if since is not None:
-        # Outlook's Restrict/Find syntax expects a locale-formatted literal
-        # in local time, not ISO/UTC.
-        since_local = since.astimezone()
-        filter_parts.append(since_local.strftime("[ReceivedTime] >= '%m/%d/%Y %H:%M %p'"))
-    filtered_items = inbox.Items.Restrict(" AND ".join(filter_parts))
+    # Filter to unread via Outlook's own Restrict() *before* iterating in
+    # Python - this inbox has 28k+ items and almost all of them are unread,
+    # so reading properties off each one individually one Python-side COM
+    # round-trip at a time made a sync take several minutes or longer.
+    #
+    # The `since` bound is deliberately NOT pushed into Restrict()'s date
+    # literal - that syntax is locale/timezone-sensitive and was silently
+    # excluding matches that should have passed (mismatched local-time
+    # round-trip vs. this Outlook profile's configured timezone), with no
+    # error to signal it. Sorting newest-first and comparing `since` as a
+    # plain Python UTC datetime is unambiguous, and breaking out as soon as
+    # we cross the boundary keeps this from re-scanning the whole set.
+    unread_items = inbox.Items.Restrict("[Unread] = True")
+    unread_items.Sort("[ReceivedTime]", True)
 
     messages = []
-    for item in filtered_items:
+    for item in unread_items:
         try:
             received_dt = item.ReceivedTime
             body = item.Body
@@ -77,6 +78,9 @@ def fetch_new_messages(since: datetime | None = None) -> list[dict]:
             entry_id = item.EntryID
         except AttributeError:
             continue  # not a mail item (e.g. a meeting request/receipt)
+
+        if since is not None and received_dt <= since:
+            break  # sorted newest-first, so everything after this is older too
 
         messages.append(
             {
