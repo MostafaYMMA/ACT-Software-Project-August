@@ -74,7 +74,7 @@ function renderProjects(container, userInitials){
     container.innerHTML = `
       <div class="empty-state" style="grid-column: 1/-1; padding: 40px 20px; text-align: center;">
         <div class="glyph">📁</div>
-        <div>No projects assigned to you.</div>
+        <div>No available projects</div>
       </div>`;
     return;
   }

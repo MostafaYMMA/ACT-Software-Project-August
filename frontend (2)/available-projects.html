@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Projects · ACT</title>
+<title>Available Projects · ACT</title>
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -50,7 +50,7 @@
             <span class="chevron">⌄</span>
           </a>
           <ul class="nav-submenu" data-projects-submenu>
-            <li><a class="nav-submenu-link" href="available-projects.html" data-submenu-page="available">Available Projects</a></li>
+            <li><a class="nav-submenu-link active" href="available-projects.html" data-submenu-page="available">Available Projects</a></li>
             <li><a class="nav-submenu-link" href="my-projects.html" data-submenu-page="my">My Projects</a></li>
           </ul>
         </li>
@@ -78,24 +78,38 @@
 
     <main class="main">
       <div class="content-top">
-        <div class="eyebrow">In flight</div>
-        <h1>Projects</h1>
+        <div class="eyebrow">Opportunities</div>
+        <h1>Available Projects</h1>
       </div>
 
       <div class="content">
-        <div class="projects-grid" id="projects-grid"></div>
+        <div class="projects-search-bar">
+          <input type="text" id="search-available" placeholder="Search projects..." class="search-input" />
+        </div>
+
+        <div class="available-projects-grid" id="available-projects-grid"></div>
       </div>
     </main>
 
+  </div>
+</div>
+
 <script src="js/app.js"></script>
-<script src="js/tasks.js"></script>
 <script src="js/projects.js"></script>
+<script src="js/project-data.js"></script>
 <script>
   const user = requireAuth();
   if(user){
-    initShell('projects', user);
-    const userInitials = resolveProjectManager(user);
-    renderProjects(document.getElementById('projects-grid'), userInitials);
+    initShell('available-projects', user);
+    initProjectsDropdown();
+    renderAvailableProjects(document.getElementById('available-projects-grid'));
+    
+    const searchInput = document.getElementById('search-available');
+    if(searchInput){
+      searchInput.addEventListener('input', (e) => {
+        renderAvailableProjects(document.getElementById('available-projects-grid'), e.target.value);
+      });
+    }
   }
 </script>
 </body>
