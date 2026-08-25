@@ -366,4 +366,8 @@ function initNotifications(user){
   count.textContent = demoNotifications.length;
   count.style.display = 'flex';
   list.innerHTML = demoNotifications.map(item => `<div class="notification-item">${item}</div>`).join('');
+
+
+
+  
 }
