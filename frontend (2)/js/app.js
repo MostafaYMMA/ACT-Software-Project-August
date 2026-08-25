@@ -37,6 +37,22 @@ const Store = {
   },
 
   tasksKey(email){ return `act_tasks_${email.toLowerCase()}`; },
+  takenProjectsKey(email){ return `act_taken_projects_${email.toLowerCase()}`; },
+
+  getTakenProjects(email){
+    try{ return JSON.parse(localStorage.getItem(this.takenProjectsKey(email))) || []; }
+    catch(e){ return []; }
+  },
+  saveTakenProjects(email, ids){
+    localStorage.setItem(this.takenProjectsKey(email), JSON.stringify(ids));
+  },
+  takeProject(email, projectId){
+    const ids = this.getTakenProjects(email);
+    if(!ids.includes(projectId)){
+      ids.push(projectId);
+      this.saveTakenProjects(email, ids);
+    }
+  },
 
   getTasks(email){
     try{ return JSON.parse(localStorage.getItem(this.tasksKey(email))) || []; }
