@@ -136,23 +136,24 @@ if(pmWeekdaysEl){
     });
   }
 
-  function showPmDay(dateObj){
-    const panel = document.getElementById('pm-day-panel');
-    const label = dateObj.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    const rows = pmHoursForDay(dateObj);
-    const total = rows.reduce((sum, r) => sum + r.hours, 0);
+ function showPmDay(dateObj){
+  const panel = document.getElementById('pm-day-panel');
+  const label = dateObj.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const rows = pmHoursForDay(dateObj);
+  const total = rows.reduce((sum, r) => sum + r.hours, 0);
 
-    panel.innerHTML = `
-      <div style="font-weight:700; margin-bottom:10px;">${label} — ${total}h total</div>
-      ${rows.map(r => `
-        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--color-line);">
-          <div style="font-size:14px;">${r.name}</div>
-          <div style="font-size:13px; color:var(--color-primary-darker); font-weight:600;">${r.hours}h</div>
-        </div>
-      `).join('')}
-    `;
-    panel.style.display = 'block';
-  }
+  panel.innerHTML = `
+    <div style="font-weight:700; margin-bottom:10px;">${label} — ${total}h total</div>
+    ${rows.map(r => `
+      <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--color-line);">
+        <div style="font-size:14px;">${r.name}</div>
+        <div style="font-size:13px; color:var(--color-primary-darker); font-weight:600;">${r.hours}h</div>
+      </div>
+    `).join('')}
+  `;
+
+  document.querySelector('[data-modal="pm-day-modal"]').hidden = false;
+}
 
   function renderPmCalendar(){
     const year = pmCalDate.getFullYear();
@@ -212,7 +213,6 @@ if(pmWeekdaysEl){
   });
 
   renderPmCalendar();
-
 
 
   

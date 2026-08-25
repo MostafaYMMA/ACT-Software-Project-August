@@ -20,6 +20,16 @@
     </div>
     <div class="header-right">
       <button class="theme-toggle" type="button" aria-label="Toggle dark mode"></button>
+      <div class="notif-wrapper">
+  <button class="theme-toggle notif-toggle" type="button" aria-label="Notifications" data-notif-toggle>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+  </button>
+  <div class="notif-dropdown" data-notif-dropdown hidden>
+    <div class="notif-dropdown-title">Notifications</div>
+    <div class="notif-dropdown-divider"></div>
+    <div class="notif-empty">No new notifications</div>
+  </div>
+</div>
       <div class="profile-pill admin-profile">
         <div class="avatar">A</div>
         <div class="who"><div class="name">Administrator</div><div class="role">Admin workspace</div></div>
@@ -50,10 +60,10 @@
       <div class="content">
         <section class="admin-section active" data-panel="dashboard">
           <div class="admin-stat-grid">
-            <div class="stat-tile admin-empty-stat"><div class="label">Total users</div><div class="value">--</div><div class="delta">No data available</div></div>
-            <div class="stat-tile admin-empty-stat"><div class="label">Timecards</div><div class="value">--</div><div class="delta">No data available</div></div>
-            <div class="stat-tile admin-empty-stat"><div class="label">Records</div><div class="value">--</div><div class="delta">No data available</div></div>
-            <div class="stat-tile admin-empty-stat"><div class="label">Activity</div><div class="value">--</div><div class="delta">No data available</div></div>
+            <div class="stat-tile admin-empty-stat"><div class="label">ACTIVE PMS</div><div class="value">--</div><div class="delta">No data available</div></div>
+            <div class="stat-tile admin-empty-stat"><div class="label">PROJECTS</div><div class="value">--</div><div class="delta">No data available</div></div>
+            <div class="stat-tile admin-empty-stat"><div class="label">OPEN TASKS</div><div class="value">--</div><div class="delta">No data available</div></div>
+            <div class="stat-tile admin-empty-stat"><div class="label">ALL PMS</div><div class="value">--</div><div class="delta">No data available</div></div>
           </div>
                     <div class="admin-grid-two">
             <div class="card card-pad admin-empty-card"><div class="card-head"><h2>Overview</h2></div><div class="empty-state"><span class="empty-icon">+</span><strong>No overview data</strong><span>Admin metrics will appear here when connected.</span></div></div>
@@ -71,7 +81,7 @@
             </div>
             <div class="calendar-weekdays" id="pm-cal-weekdays"></div>
             <div class="calendar-grid" id="pm-cal-grid"></div>
-            <div id="pm-day-panel" style="display:none; margin-top:16px; padding:14px; background:var(--color-bg); border-radius:8px; border:1px solid var(--color-line);"></div>
+            
             <div style="margin-top:10px; font-size:11px; color:var(--color-ink-soft);">* بيانات تجريبية — لسه مش متصلة بنظام تسجيل ساعات حقيقي.</div>
           </div>
         </section>
@@ -87,6 +97,17 @@
 </div>
 <div class="admin-modal-backdrop" data-modal="password-modal" hidden><div class="admin-modal" role="dialog" aria-modal="true" aria-labelledby="password-modal-title"><div class="card-head"><h2 id="password-modal-title">Change Password</h2><button class="modal-close" type="button" data-modal-close aria-label="Close">&times;</button></div><form data-form="password"><div class="field"><label for="current-password">Current Password</label><input id="current-password" type="password" required /></div><div class="field"><label for="new-password">New Password</label><input id="new-password" type="password" minlength="6" required /></div><div class="field"><label for="confirm-password">Confirm New Password</label><input id="confirm-password" type="password" minlength="6" required /></div><div class="form-status" data-form-status></div><div class="modal-actions"><button class="btn btn-ghost" type="button" data-modal-close>Cancel</button><button class="btn btn-primary" type="submit">Change Password</button></div></form></div></div>
 <div class="admin-modal-backdrop" data-modal="admin-modal" hidden><div class="admin-modal" role="dialog" aria-modal="true" aria-labelledby="admin-modal-title"><div class="card-head"><h2 id="admin-modal-title">Add New Admin</h2><button class="modal-close" type="button" data-modal-close aria-label="Close">&times;</button></div><form data-form="admin"><div class="field"><label for="admin-name">Name</label><input id="admin-name" required /></div><div class="field"><label for="admin-email">Email</label><input id="admin-email" type="email" required /></div><div class="field"><label for="admin-password">Password</label><input id="admin-password" type="password" minlength="6" required /></div><div class="form-status" data-form-status></div><div class="modal-actions"><button class="btn btn-ghost" type="button" data-modal-close>Cancel</button><button class="btn btn-primary" type="submit">Add Admin</button></div></form></div></div>
+
+<div class="admin-modal-backdrop" data-modal="pm-day-modal" hidden>
+  <div class="admin-modal" role="dialog" aria-modal="true" aria-labelledby="pm-day-modal-title">
+    <div class="card-head">
+      <h2 id="pm-day-modal-title">Day details</h2>
+      <button class="modal-close" type="button" data-modal-close aria-label="Close">&times;</button>
+    </div>
+    <div id="pm-day-panel"></div>
+  </div>
+</div>
+
 <script src="js/admin.js"></script>
 </body>
 </html>
