@@ -256,7 +256,8 @@ const doneTasks = monthTasks.filter(t =>
         cells += `
 <div style="height:50px; border-radius:8px; background:var(--color-line); padding:6px; display:flex; flex-direction:column; justify-content:space-between; ${isToday ? 'outline:2px solid var(--color-primary);' : ''}">
   <div style="font-size:12px; color:var(--color-ink-soft);">${day}</div>${dayTasks.length > 0 ? (() => {
-  const priorityColorMap = { high: '#4caf50', med: '#ffd60a', low: '#ff4d4d' };
+
+  const priorityColorMap = {  };
   const priorityRank = { high: 3, med: 2, low: 1 };
   const topTask = [...dayTasks].sort((a, b) => (priorityRank[b.priority] || 0) - (priorityRank[a.priority] || 0))[0];
   const color = priorityColorMap[topTask.priority] || '#ff6a00';

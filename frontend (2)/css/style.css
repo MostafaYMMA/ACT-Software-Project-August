@@ -1457,12 +1457,18 @@ body.dark-mode .chip-project {
 .cal-btn:hover { background: var(--color-primary); color: #fff; }
 
 #cal-today {
-  background: var(--color-primary);
+  background: var(--color-surface);
   color: #fff;
-  border: none;
+  border-radius: 6px;
   font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s;
 }
-#cal-today:hover { filter: brightness(1.1); }
+#cal-today:hover {
+   background: var(--color-primary); color: #fff; 
+}
 
 .calendar-weekdays {
   display: grid;
@@ -1801,4 +1807,5 @@ body.dark-mode .nav-submenu-link.active {
   .search-input {
     max-width: 100%;
   }
+
 }
