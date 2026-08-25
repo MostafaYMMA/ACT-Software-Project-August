@@ -1458,7 +1458,7 @@ body.dark-mode .chip-project {
 
 #cal-today {
   background: var(--color-surface);
-  color: #fff;
+  color: var(--color-ink);
   border-radius: 6px;
   font-weight: 600;
   padding: 4px 10px;
