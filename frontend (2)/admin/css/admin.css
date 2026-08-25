@@ -54,3 +54,21 @@
 @media (max-width: 1050px){ .admin-stat-grid{ grid-template-columns: repeat(2, minmax(150px, 1fr)); } }
 @media (max-width: 780px){ .admin-grid-two, .admin-settings-grid{ grid-template-columns: 1fr; } }
 @media (max-width: 520px){ .admin-stat-grid{ grid-template-columns: 1fr 1fr; gap: 10px; } .admin-stat-grid .stat-tile{ padding: 14px; } .admin-badge{ display: none; } }
+.notif-wrapper{ position: relative; }
+.notif-dropdown{
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 260px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 18px 50px rgba(36,28,21,.18);
+  padding: 16px;
+  z-index: 60;
+  animation: admin-modal-in .18s ease both;
+}
+.notif-dropdown[hidden]{ display: none; }
+.notif-dropdown-title{ font-weight: 700; font-size: 15px; color: var(--color-ink); margin-bottom: 12px; }
+.notif-dropdown-divider{ height: 1px; background: var(--color-line); margin: 0 -16px 12px; }
+.notif-empty{ text-align: center; color: var(--color-ink-soft); font-size: 13px; padding: 18px 0; }
