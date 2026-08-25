@@ -52,17 +52,34 @@ const PROJECT_STATUS_LABEL = { active: 'Active', paused: 'Paused', done: 'Comple
 const PROJECT_STATUS_CLASS = { active: 'status-active', paused: 'status-paused', done: 'status-done' };
 
 /**
- * Get all available projects (not managed by the current user)
+ *  Get all available projects (not managed by the current user, and not
+ * already taken by them)
  */
-function getAvailableProjects(currentUserInitials) {
-  return ALL_PROJECTS.filter(p => p.managerInitials !== currentUserInitials);
+function getAvailableProjects(currentUserInitials, email) {
+  const taken = email ? Store.getTakenProjects(email) : [];
+  return ALL_PROJECTS.filter(p => p.managerInitials !== currentUserInitials && !taken.includes(p.id));
 }
 
 /**
- * Get user's own projects
+ * Get user's own projects: the ones they manage, plus any they've taken
+ * from the available projects list.
  */
-function getMyProjects(currentUserInitials) {
-  return ALL_PROJECTS.filter(p => p.managerInitials === currentUserInitials);
+function getMyProjects(currentUserInitials, email) {
+  const taken = email ? Store.getTakenProjects(email) : [];
+  const managed = ALL_PROJECTS.filter(p => p.managerInitials === currentUserInitials);
+  const takenProjects = ALL_PROJECTS
+    .filter(p => p.managerInitials !== currentUserInitials && taken.includes(p.id))
+    .map(p => ({ ...p, role: 'Team Member' }));
+  return [...managed, ...takenProjects];
+}
+
+/**
+ * Take an available project — adds it to the current user's My Projects.
+ */
+function takeProject(projectId){
+  const user = Store.currentUser();
+  if(!user) return;
+  Store.takeProject(user.email, projectId);
 }
 
 /**
@@ -71,8 +88,9 @@ function getMyProjects(currentUserInitials) {
 function renderAvailableProjects(container, searchTerm = '') {
   if(!container) return;
   
-  const currentUserInitials = resolveProjectManager(Store.currentUser());
-  let projects = getAvailableProjects(currentUserInitials);
+  const currentUser = Store.currentUser();
+  const currentUserInitials = resolveProjectManager(currentUser);
+  let projects = getAvailableProjects(currentUserInitials, currentUser && currentUser.email);
   
   // Filter by search term
   if(searchTerm.trim()){
@@ -117,9 +135,22 @@ function renderAvailableProjects(container, searchTerm = '') {
       </div>
       <div class="project-action">
         <button class="btn-primary" onclick="window.location.href='project-detail.html?id=${encodeURIComponent(p.id)}'">View Project</button>
+        <button class="btn-icon-take" type="button" title="Take project" aria-label="Take project" data-take-id="${p.id}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        </button>
       </div>
     </div>
   `).join('');
+
+  container.querySelectorAll('[data-take-id]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      takeProject(btn.dataset.takeId);
+      renderAvailableProjects(container, searchTerm);
+      updateNavCounts(Store.currentUser().email, resolveProjectManager(Store.currentUser()));
+    });
+  });
 }
 
 /**
@@ -129,7 +160,7 @@ function renderMyProjects(container, user, searchTerm = '') {
   if(!container) return;
   
   const currentUserInitials = resolveProjectManager(user);
-  let projects = getMyProjects(currentUserInitials);
+  let projects = getMyProjects(currentUserInitials, user && user.email);
   
   // Filter by search term
   if(searchTerm.trim()){
@@ -237,6 +268,7 @@ if (typeof globalThis !== 'undefined') {
   globalThis.ALL_PROJECTS = ALL_PROJECTS;
   globalThis.getAvailableProjects = getAvailableProjects;
   globalThis.getMyProjects = getMyProjects;
+  globalThis.takeProject = takeProject;
   globalThis.renderAvailableProjects = renderAvailableProjects;
   globalThis.renderMyProjects = renderMyProjects;
   globalThis.formatDate = formatDate;
