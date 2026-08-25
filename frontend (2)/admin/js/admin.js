@@ -23,6 +23,20 @@ adminThemeToggle.addEventListener('click', () => {
 });
 
 updateAdminThemeButton();
+// ===== Notifications =====
+const adminNotifBtn = document.querySelector('[data-admin-notif-btn]');
+const adminNotifBox = document.querySelector('[data-admin-notif-box]');
+if(adminNotifBtn && adminNotifBox){
+  adminNotifBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    adminNotifBox.classList.toggle('show');
+  });
+  document.addEventListener('click', (e) => {
+    if(adminNotifBox.classList.contains('show') && !adminNotifBox.contains(e.target) && e.target !== adminNotifBtn){
+      adminNotifBox.classList.remove('show');
+    }
+  });
+}
 
 function setAdminSection(section){
   const selectedSection = adminTitles[section] ? section : 'dashboard';
