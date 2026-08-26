@@ -24,6 +24,13 @@
   .overview-goto-approvals-btn:hover{ background:var(--color-primary, #F97316); color:#fff; }
   .overview-goto-approvals-btn:active{ transform:scale(0.94); }
   .card-head:has(.overview-goto-approvals-btn){ display:flex; align-items:center; }
+  .stat-tile-clickable{
+  cursor:pointer;
+  transition:transform .1s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.stat-tile-clickable:hover{ border-color:var(--color-primary, #F97316); box-shadow:0 4px 14px rgba(0,0,0,.06); }
+.stat-tile-clickable:active{ transform:scale(0.98); }
+.stat-tile-clickable:focus-visible{ outline:2px solid var(--color-primary, #F97316); outline-offset:2px; }
 </style>
 </head>
 <body class="admin-interface">
@@ -86,7 +93,7 @@
             <div class="stat-tile admin-empty-stat"><div class="label">ACTIVE PMS</div><div class="value">--</div><div class="delta">No data available</div></div>
             <div class="stat-tile admin-empty-stat"><div class="label">PROJECTS</div><div class="value">--</div><div class="delta">No data available</div></div>
             <div class="stat-tile admin-empty-stat"><div class="label">OPEN TASKS</div><div class="value">--</div><div class="delta">No data available</div></div>
-            <div class="stat-tile admin-empty-stat"><div class="label">ALL PMS</div><div class="value">--</div><div class="delta">No data available</div></div>
+            <div class="stat-tile admin-empty-stat stat-tile-clickable" data-goto-section="project-managers" role="button" tabindex="0" aria-label="Go to View Project Managers"><div class="label">ALL PMS</div><div class="value">--</div><div class="delta">No data available</div></div>
           </div>
                     <div class="admin-grid-two">
             <div class="card card-pad admin-empty-card"><div class="card-head"><h2>Project Manager Approval</h2><button type="button" class="overview-goto-approvals-btn" data-goto-section="approvals" aria-label="Go to Project Manager Approve" title="Go to Project Manager Approve"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12l3 3 5-6"/></svg></button></div><div class="empty-state"><span class="empty-icon">+</span><strong>No data</strong><span>Admin metrics will appear here when connected.</span></div></div>
@@ -134,12 +141,21 @@
 <script src="js/admin.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-goto-section]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const target = btn.getAttribute('data-goto-section');
-        const navBtn = document.querySelector(`.admin-nav-link[data-section="${target}"]`);
-        if (navBtn) navBtn.click();
-      });
+    const gotoSection = (el) => {
+      const target = el.getAttribute('data-goto-section');
+      const navBtn = document.querySelector(`.admin-nav-link[data-section="${target}"]`);
+      if (navBtn) navBtn.click();
+    };
+    document.querySelectorAll('[data-goto-section]').forEach((el) => {
+      el.addEventListener('click', () => gotoSection(el));
+      if (el.getAttribute('role') === 'button') {
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            gotoSection(el);
+          }
+        });
+      }
     });
   });
 </script>
